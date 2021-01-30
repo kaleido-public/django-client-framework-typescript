@@ -1,2 +1,2 @@
 export * from "./managers"
-export { Ajax } from "./ajax_drivers"
+export { Ajax, AjaxDriver, AjaxError } from "./ajax_drivers"

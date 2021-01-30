@@ -1,31 +1,33 @@
 {
-    "name": "django-client-framework",
-    "version": "1.0.0",
-    "description": "",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "scripts": {
-        "build": "tsc",
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "prepublish": "tsc",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/cozybearca/django-client-framework-typescript.git"
-    },
-    "author": "",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/cozybearca/django-client-framework-typescript/issues"
-    },
-    "homepage": "https://github.com/cozybearca/django-client-framework-typescript#readme",
-    "devDependencies": {
-        "@types/jquery": "^3.5.5",
-        "@types/js-cookie": "^2.2.6",
-        "typescript": "^4.1.3"
-    },
-    "dependencies": {
-        "jquery": "^3.5.1",
-        "js-cookie": "^2.2.1"
-    }
+  "name": "django-client-framework",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "prepublish": "tsc",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cozybearca/django-client-framework-typescript.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cozybearca/django-client-framework-typescript/issues"
+  },
+  "homepage": "https://github.com/cozybearca/django-client-framework-typescript#readme",
+  "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/jquery": "^3.5.5",
+    "@types/js-cookie": "^2.2.6",
+    "@types/qs": "^6.9.5",
+    "typescript": "^4.1.3",
+    "axios": "^0.21.1",
+    "qs": "^6.9.6"
+  },
+  "peerDependencies": {},
+  "dependencies": {}
 }

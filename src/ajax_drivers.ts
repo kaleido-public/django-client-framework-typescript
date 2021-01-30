@@ -1,41 +1,103 @@
-import * as Cookies from "js-cookie"
 import { Decodable } from "./Decodable"
-import * as $ from "jquery"
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios"
 import { Model, PageResult } from "./managers"
+import * as qs from "qs"
 
 export type HttpMethod = "DELETE" | "POST" | "GET" | "PUT" | "PATCH"
 
 let REQUEST_ID = 0
+type StringDict = { [_: string]: string }
 
 export interface AjaxDriver {
-    request(method: HttpMethod, url: string, data?: Object): Promise<Object>
+    request(method: HttpMethod, url: string, data?: any): Promise<any>
     request_decode<T extends Decodable>(
         T: new () => T,
         method: HttpMethod,
         url: string,
-        data?: Object
+        data?: any
     ): Promise<T>
 
     request_decode_page<T extends Model>(
         T: new () => T,
         method: HttpMethod,
         url: string,
-        data?: Object
+        data?: any
     ): Promise<PageResult<T>>
 
     request_void<T extends Decodable>(
         method: HttpMethod,
         url: string,
-        data?: Object
+        data?: any
     ): Promise<void>
+
+    additional_headers: StringDict
+    auth_token: string
+    url_prefix: string
 }
 
-class JqueryAjaxDriver implements AjaxDriver {
-    async request(method: HttpMethod, url: string, data: Object = {}): Promise<Object> {
+export interface AjaxError {
+    readonly json: any
+    readonly status: number
+}
+
+class AxiosAjaxError implements AjaxError {
+    constructor(private error: AxiosError) {}
+    get json(): any {
+        return this.error.response?.data
+    }
+    get status(): number {
+        return this.error.response?.status || 0
+    }
+}
+
+class AxiosAjaxDriver implements AjaxDriver {
+    private global_target_holder = {}
+
+    get global_target(): any {
+        if (typeof window == "undefined") {
+            return this.global_target_holder
+        } else {
+            return window
+        }
+    }
+
+    get additional_headers(): StringDict {
+        return this.global_target["additional_headers"] || {}
+    }
+    get auth_token(): string {
+        return this.global_target["auth_token"] || ""
+    }
+    get url_prefix(): string {
+        return this.global_target["url_prefix"] || ""
+    }
+
+    set additional_headers(val: StringDict) {
+        this.global_target["additional_headers"] = val
+    }
+    set auth_token(val: string) {
+        this.global_target["auth_token"] = val
+    }
+    set url_prefix(val: string) {
+        this.global_target["url_prefix"] = val
+    }
+
+    private get_headers(): StringDict {
+        let headers: StringDict = {
+            "content-type": "application/json; charset=UTF-8",
+            ...this.additional_headers,
+        }
+        if (this.auth_token) {
+            headers = { Authorization: `Token ${this.auth_token}`, ...headers }
+        }
+        return headers
+    }
+
+    async request(method: HttpMethod, url: string, data: any = {}): Promise<any> {
         const current_request_id = REQUEST_ID++
+        url = this.url_prefix + url
         try {
             console.debug(
-                "JqueryAjaxDriver sent",
+                "AxiosAjaxDriver sent",
                 current_request_id,
                 method,
                 url,
@@ -43,43 +105,45 @@ class JqueryAjaxDriver implements AjaxDriver {
             )
         } catch (err) {
             console.error(
-                "JqueryAjaxDriver sent",
+                "AxiosAjaxDriver failed to send",
                 current_request_id,
                 method,
                 url,
-                data
+                JSON.stringify(data)
             )
             throw err
         }
         try {
-            const response = await new Promise((resolve, reject) => {
-                return $.ajax({
-                    data: method == "GET" ? data : JSON.stringify(data),
-                    contentType: "application/json; charset=UTF-8",
-                    dataType: "json",
-                    url: url,
-                    method: method,
-                    headers: {
-                        "X-CSRFToken": Cookies.get("csrftoken"),
-                    },
-                    success: resolve,
-                    error: reject,
-                    timeout: 30 * 1000,
-                })
-            })
+            let request: AxiosRequestConfig = {
+                url: url,
+                method: method,
+                headers: this.get_headers(),
+                timeout: 30 * 1000,
+                paramsSerializer: function (params) {
+                    return qs.stringify(params, { arrayFormat: "brackets" })
+                },
+            }
+            if (method == "GET") {
+                request = { ...request, params: data }
+            } else {
+                request = { ...request, data: data }
+            }
+            const response = await axios(request)
             console.debug(
-                "JqueryAjaxDriver received",
+                "AxiosAjaxDriver received",
                 current_request_id,
-                JSON.stringify(response)
+                response.status,
+                response.statusText,
+                JSON.stringify(response.data)
             )
-            return response as any
+            return response.data
         } catch (error) {
             console.warn(
-                "JqueryAjaxDriver failed",
+                "AxiosAjaxDriver failed to receive",
                 current_request_id,
                 JSON.stringify(error)
             )
-            throw error
+            throw new AxiosAjaxError(error)
         }
     }
 
@@ -87,7 +151,7 @@ class JqueryAjaxDriver implements AjaxDriver {
         T: new () => T,
         method: HttpMethod,
         url: string,
-        data: Object = {}
+        data: any = {}
     ): Promise<T> {
         let response = await this.request(method, url, data)
         return Decodable.decode_json(T, response)
@@ -97,15 +161,21 @@ class JqueryAjaxDriver implements AjaxDriver {
         T: new () => T,
         method: HttpMethod,
         url: string,
-        data: Object = {}
+        data: any = {}
     ): Promise<PageResult<T>> {
-        let response = (await this.request(method, url, data)) as any
+        let response: any = await this.request(method, url, data)
         let page = new PageResult<T>()
         Object.assign(page, response)
-        page.objects = response["objects"].map((val: any) =>
-            Decodable.decode_json(T, val)
-        )
-        return page
+        if ("objects" in response) {
+            page.objects = response["objects"].map((val: any) =>
+                Decodable.decode_json(T, val)
+            )
+            return page
+        } else {
+            throw Error(
+                `Server did not return objects. Response: ${JSON.stringify(response)}`
+            )
+        }
     }
 
     async request_void(
@@ -117,4 +187,4 @@ class JqueryAjaxDriver implements AjaxDriver {
     }
 }
 
-export const Ajax: AjaxDriver = new JqueryAjaxDriver()
+export const Ajax: AjaxDriver = new AxiosAjaxDriver()
