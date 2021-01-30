@@ -100,7 +100,7 @@ export class ObjectManagerImpl<T extends Model> {
         return Ajax.request_void("DELETE", this.object_url, {})
     }
 
-    async get(): Promise<void> {
+    async refresh(): Promise<void> {
         const object = await Ajax.request_decode(this.T, "GET", this.object_url, {})
         this.model = object
     }
@@ -154,7 +154,7 @@ abstract class AbstractCollectionManager<T extends Model> {
         const page = await this.page({ query: query, page: { limit: 2 } })
         if (page.total !== 1) {
             throw new Error(
-                `.get() must receive exactly 1 object, but got ${page.total}`
+                `.get() must receive exactly 1 object, but got ${page.total}.`
             )
         }
         return page.objects[0].manager
@@ -198,7 +198,7 @@ export class CollectionManager<T extends Model> extends AbstractCollectionManage
             return page.objects[0].manager
         } else {
             throw new Error(
-                `.get() must receive exactly 1 object, but got ${page.total}`
+                `.get() must receive exactly 1 object, but got ${page.total}.`
             )
         }
     }
@@ -217,7 +217,7 @@ export class CollectionManager<T extends Model> extends AbstractCollectionManage
             return page.objects[0].manager.update(defaults)
         } else {
             throw new Error(
-                `.get() must receive exactly 1 object, but got ${page.total}`
+                `.get() must receive exactly 1 object, but got ${page.total}.`
             )
         }
     }
