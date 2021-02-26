@@ -20,7 +20,6 @@
   },
   "homepage": "https://github.com/cozybearca/django-client-framework-typescript#readme",
   "devDependencies": {
-    "@types/axios": "^0.14.0",
     "@types/jquery": "^3.5.5",
     "@types/js-cookie": "^2.2.6",
     "@types/qs": "^6.9.5",

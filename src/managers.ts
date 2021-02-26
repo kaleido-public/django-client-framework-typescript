@@ -72,16 +72,16 @@ export class ObjectManagerImpl<T extends Model> {
         this.updated = object.copy()
         this.T = object.constructor as new () => T
         return new Proxy(this, {
-            get(target: ObjectManagerImpl<T>, key: keyof T, receiver) {
-                if (target.updated[key] !== undefined) {
+            get(target: ObjectManagerImpl<T>, key: string & keyof T, receiver) {
+                if (key in target.updated) {
                     return target.updated[key]
-                } else if (target.model[key] !== undefined) {
+                } else if (key in target.model) {
                     return target.model[key]
                 } else {
                     return Reflect.get(target, key, receiver)
                 }
             },
-            set(target: ObjectManagerImpl<T>, key: keyof T, value, receiver) {
+            set(target: ObjectManagerImpl<T>, key: string & keyof T, value, receiver) {
                 if (target.hasOwnProperty(key)) {
                     return Reflect.set(target, key, value, receiver)
                 } else {
