@@ -29,9 +29,9 @@ jobs:
       - name: Create Pull Request
         uses: repo-sync/pull-request@v2
         with:
-          destination_branch: "main"
+          destination_branch: "staging"
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          pr_title: "main <- ${BRANCH_NAME}: ${COMMIT_TITLE}"
+          pr_title: "staging <- ${BRANCH_NAME}: ${COMMIT_TITLE}"
 
       - name: Publish if version has been updated
         if: env.BRANCH_NAME == 'release'
