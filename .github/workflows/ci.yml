@@ -26,12 +26,20 @@ jobs:
           .github/workflows/set_env
           .github/workflows/set_env -w
 
-      - name: Create Pull Request
+      - name: Create Pull Request (Staging)
         uses: repo-sync/pull-request@v2
         with:
           destination_branch: "staging"
           github_token: ${{ secrets.GITHUB_TOKEN }}
           pr_title: "staging <- ${BRANCH_NAME}: ${COMMIT_TITLE}"
+
+      - name: Create Pull Request (Release)
+        if: env.BRANCH_NAME == 'staging'
+        uses: repo-sync/pull-request@v2
+        with:
+          destination_branch: "release"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_title: "release <- ${BRANCH_NAME}: ${COMMIT_TITLE}"
 
       - name: Publish if version has been updated
         if: env.BRANCH_NAME == 'release'
