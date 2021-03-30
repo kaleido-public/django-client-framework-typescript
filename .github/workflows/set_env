@@ -3,6 +3,8 @@
 import os
 from subprocess import CalledProcessError, run
 from typing import Dict, List
+from pathlib import Path
+import json
 
 
 def github_repo_name():
@@ -62,6 +64,12 @@ def should_upload_package() -> bool:
     return (ci_yaml_changed() and is_dev_branch()) or git_branch_name() == "release"
 
 
+def package_version() -> str:
+    with open("package.json", "rb") as content:
+        package = json.load(content)
+    return package["version"]
+
+
 def get_env() -> Dict[str, str]:
     return {
         "PROJECT_NAME": github_repo_name(),
@@ -72,6 +80,7 @@ def get_env() -> Dict[str, str]:
         "TARGET_BRANCH": target_branch(),
         "COMMIT_TITLE": git_commit_title(),
         "SHOULD_UPLOAD_PACKAGE": should_upload_package(),
+        "PACKAGE_VERSION": package_version(),
     }
 
 
