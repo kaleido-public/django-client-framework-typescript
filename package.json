@@ -6,9 +6,9 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "tsc"
   },
-  "prepublish": "tsc",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cozybearca/django-client-framework-typescript.git"
