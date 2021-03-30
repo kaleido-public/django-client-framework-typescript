@@ -119,7 +119,7 @@ class AxiosAjaxDriver implements AjaxDriver {
                 method: method,
                 headers: this.get_headers(),
                 timeout: 30 * 1000,
-                paramsSerializer: function (params) {
+                paramsSerializer: function (params: any) {
                     return qs.stringify(params, { arrayFormat: "brackets" })
                 },
             }
