@@ -52,12 +52,12 @@ export interface PageQuery {
 
 export function object_url(T: new () => Model, id: number) {
     let object = new T()
-    return `/api/v1/${object.model_name}/${id}`
+    return `/${object.model_name}/${id}`
 }
 
 export function collection_url(T: new () => Model) {
     let object = new T()
-    return `/api/v1/${object.model_name}`
+    return `/${object.model_name}`
 }
 
 export type ObjectManager<T extends Model> = ObjectManagerImpl<T> & T
@@ -93,7 +93,7 @@ export class ObjectManagerImpl<T extends Model> {
     }
 
     get object_url(): string {
-        return `/api/v1/${this.model.model_name}/${this.model.id}`
+        return `/${this.model.model_name}/${this.model.id}`
     }
 
     async delete(): Promise<void> {
@@ -171,7 +171,7 @@ export class CollectionManager<T extends Model> extends AbstractCollectionManage
     }
 
     get collection_url(): string {
-        return `/api/v1/${this.model_name}`
+        return `/${this.model_name}`
     }
 
     async create(data: Partial<T>): Promise<ObjectManager<T>> {
@@ -236,7 +236,7 @@ export class RelatedObjectManager<T extends Model, P extends Model> {
     }
 
     private get object_url(): string {
-        return `/api/v1/${this.parent_model_name}/${this.parent_id}/${this.parent_key}`
+        return `/${this.parent_model_name}/${this.parent_id}/${this.parent_key}`
     }
 
     async get(): Promise<ObjectManager<T> | null> {
@@ -276,7 +276,7 @@ export class RelatedCollectionManager<
     }
 
     get collection_url(): string {
-        return `/api/v1/${this.parent_model_name}/${this.parent_id}/${this.parent_key}`
+        return `/${this.parent_model_name}/${this.parent_id}/${this.parent_key}`
     }
 
     async add_ids(ids: number[]): Promise<void> {
