@@ -1,7 +1,8 @@
-import { Decodable } from "./Decodable"
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios"
-import { Model, PageResult } from "./managers"
 import * as qs from "qs"
+import { JSONDecoder } from "./JSONDecoder"
+import { Model } from "./Model"
+import { PageResult } from "./PageResult"
 
 export type HttpMethod = "DELETE" | "POST" | "GET" | "PUT" | "PATCH"
 
@@ -10,7 +11,7 @@ type StringDict = { [_: string]: string }
 
 export interface AjaxDriver {
     request(method: HttpMethod, url: string, data?: any): Promise<any>
-    request_decode<T extends Decodable>(
+    request_decode<T extends Model>(
         T: new () => T,
         method: HttpMethod,
         url: string,
@@ -24,7 +25,7 @@ export interface AjaxDriver {
         data?: any
     ): Promise<PageResult<T>>
 
-    request_void<T extends Decodable>(
+    request_void<T extends Model>(
         method: HttpMethod,
         url: string,
         data?: any
@@ -147,14 +148,14 @@ class AxiosAjaxDriver implements AjaxDriver {
         }
     }
 
-    async request_decode<T extends Decodable>(
+    async request_decode<T extends Model>(
         T: new () => T,
         method: HttpMethod,
         url: string,
         data: any = {}
     ): Promise<T> {
         let response = await this.request(method, url, data)
-        return Decodable.decode_json(T, response)
+        return JSONDecoder.decode_model(T, response)
     }
 
     async request_decode_page<T extends Model>(
@@ -168,7 +169,7 @@ class AxiosAjaxDriver implements AjaxDriver {
         Object.assign(page, response)
         if ("objects" in response) {
             page.objects = response["objects"].map((val: any) =>
-                Decodable.decode_json(T, val)
+                JSONDecoder.decode_model(T, val)
             )
             return page
         } else {
