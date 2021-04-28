@@ -10,7 +10,13 @@ let REQUEST_ID = 0
 type StringDict = { [_: string]: string }
 
 export interface AjaxDriver {
-    request(method: HttpMethod, url: string, data?: any): Promise<any>
+    request(options: {
+        method: HttpMethod
+        url: string
+        data?: any
+        url_prefix?: string
+    }): Promise<any>
+
     request_decode<T extends Model>(
         T: new () => T,
         method: HttpMethod,
@@ -69,7 +75,7 @@ class AxiosAjaxDriver implements AjaxDriver {
         return this.global_target["auth_token"] || ""
     }
     get url_prefix(): string {
-        return this.global_target["url_prefix"] || ""
+        return this.global_target["url_prefix"] || "/"
     }
 
     set additional_headers(val: StringDict) {
@@ -93,9 +99,16 @@ class AxiosAjaxDriver implements AjaxDriver {
         return headers
     }
 
-    async request(method: HttpMethod, url: string, data: any = {}): Promise<any> {
+    async request(options: {
+        method: HttpMethod
+        url: string
+        data?: any
+        url_prefix?: string
+    }): Promise<any> {
         const current_request_id = REQUEST_ID++
-        url = this.url_prefix + url
+        const method = options.method
+        const data = options.data ?? {}
+        const url = (options.url_prefix ?? this.url_prefix) + options.url
         try {
             console.debug(
                 "AxiosAjaxDriver sent",
@@ -154,7 +167,7 @@ class AxiosAjaxDriver implements AjaxDriver {
         url: string,
         data: any = {}
     ): Promise<T> {
-        let response = await this.request(method, url, data)
+        let response = await this.request({ method, url, data })
         return JSONDecoder.decode_model(T, response)
     }
 
@@ -164,7 +177,7 @@ class AxiosAjaxDriver implements AjaxDriver {
         url: string,
         data: any = {}
     ): Promise<PageResult<T>> {
-        let response: any = await this.request(method, url, data)
+        let response: any = await this.request({ method, url, data })
         let page = new PageResult<T>()
         Object.assign(page, response)
         if ("objects" in response) {
@@ -184,7 +197,7 @@ class AxiosAjaxDriver implements AjaxDriver {
         url: string,
         data: Object = {}
     ): Promise<void> {
-        await this.request(method, url, data)
+        await this.request({ method, url, data })
     }
 }
 

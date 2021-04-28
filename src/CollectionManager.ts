@@ -12,7 +12,7 @@ export class CollectionManager<T extends Model> extends AbstractCollectionManage
     }
 
     get collection_url(): string {
-        return `/${model_name(this.T)}`
+        return model_name(this.T)
     }
 
     async create(data: Partial<T>): Promise<ObjectManager<T>> {

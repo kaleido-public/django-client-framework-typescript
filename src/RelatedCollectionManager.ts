@@ -1,6 +1,5 @@
 import { Ajax } from "./AjaxDriver"
 import { Model } from "./Model"
-import { model_name } from "./helpers"
 import { AbstractCollectionManager } from "./AbstractCollectionManager"
 
 export class RelatedCollectionManager<
@@ -13,14 +12,14 @@ export class RelatedCollectionManager<
     T: new () => T
     constructor(T: new () => T, parent: P, parent_key: string) {
         super()
-        this.parent_id = parent.id
-        this.parent_model_name = model_name(parent)
+        this.parent_id = parent.id ?? -1
+        this.parent_model_name = parent._model_name
         this.parent_key = parent_key
         this.T = T
     }
 
     get collection_url(): string {
-        return `/${this.parent_model_name}/${this.parent_id}/${this.parent_key}`
+        return `${this.parent_model_name}/${this.parent_id}/${this.parent_key}`
     }
 
     async add_ids(ids: number[]): Promise<void> {

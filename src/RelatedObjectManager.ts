@@ -1,5 +1,4 @@
 import { Ajax } from "./AjaxDriver"
-import { model_name } from "./helpers"
 import { Model } from "./Model"
 import { ObjectManager, ObjectManagerImpl } from "./ObjectManager"
 
@@ -9,14 +8,14 @@ export class RelatedObjectManager<T extends Model, P extends Model> {
     parent_model_name: string
     T: new () => T
     constructor(T: new () => T, parent: P, parent_key: string) {
-        this.parent_id = parent.id
-        this.parent_model_name = model_name(parent)
+        this.parent_id = parent.id ?? -1
+        this.parent_model_name = parent._model_name
         this.parent_key = parent_key
         this.T = T
     }
 
     private get object_url(): string {
-        return `/${this.parent_model_name}/${this.parent_id}/${this.parent_key}`
+        return `${this.parent_model_name}/${this.parent_id}/${this.parent_key}`
     }
 
     async get(): Promise<ObjectManager<T> | null> {

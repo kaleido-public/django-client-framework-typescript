@@ -35,11 +35,11 @@ export class ObjectManagerImpl<T extends Model> {
     }
 
     get model_name(): string {
-        return this.model.constructor.name.toLowerCase()
+        return this.original._model_name
     }
 
     get object_url(): string {
-        return `/${this.model_name}/${this.original.id}`
+        return `${this.model_name}/${this.original.id}`
     }
 
     async delete(): Promise<void> {
@@ -48,7 +48,7 @@ export class ObjectManagerImpl<T extends Model> {
 
     async refresh(): Promise<void> {
         const model = await Ajax.request_decode(this.T, "GET", this.object_url, {})
-        this.original = model
+        this.original = Object.assign(new this.T(), model)
         this.updated = model
     }
 
@@ -64,13 +64,13 @@ export class ObjectManagerImpl<T extends Model> {
 
         let model = await Ajax.request_decode(this.T, "PATCH", this.object_url, to_send)
 
-        this.original = model
+        this.original = Object.assign(new this.T(), model)
         this.updated = model
     }
 
     async update(data: Partial<T>): Promise<this> {
         let model = await Ajax.request_decode(this.T, "PATCH", this.object_url, data)
-        this.original = model
+        this.original = Object.assign(new this.T(), model)
         this.updated = model
         return this
     }
