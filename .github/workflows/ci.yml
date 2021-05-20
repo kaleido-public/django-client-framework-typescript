@@ -29,11 +29,11 @@ jobs:
 
       - name: Set up env vars
         run: |
-          .github/workflows/set_env.py
-          .github/workflows/set_env.py -w
+          set_env.py
+          set_env.py -w
       - name: Install workflow
         run: |
-          sudo -E .github/workflows/installation.py
+          sudo -E installation.py
 
       - name: Create PR
         if: env.IS_DEV_BRANCH == 'True' || env.BRANCH_NAME == 'staging'
