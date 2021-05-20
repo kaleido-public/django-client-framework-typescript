@@ -94,8 +94,8 @@ def pr_body() -> str:
 def overwrite_path() -> str:
     return ":".join(
         [
-            os.environ["PATH"],
             str(__dir__),
+            os.environ["PATH"],
         ]
     )
 
