@@ -3,8 +3,9 @@
 import os
 from subprocess import CalledProcessError, run
 from typing import Dict, List
-from pathlib import Path
 import json
+
+import click
 
 
 def github_repo_name():
@@ -84,6 +85,8 @@ def get_env() -> Dict[str, str]:
     }
 
 
+@click.command()
+@click.option("-w", "--write", is_flag=True)
 def main(write):
     content = ""
     for key, val in get_env().items():
@@ -97,7 +100,6 @@ def main(write):
 
 if __name__ == "__main__":
     try:
-        main(write=False)
-        main(write=True)
+        main()
     except CalledProcessError as err:
         exit(err.stdout + err.stderr)

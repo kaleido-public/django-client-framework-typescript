@@ -23,7 +23,12 @@ jobs:
 
       - name: Set up env vars
         run: |
-          .github/workflows/set_env
+          .github/workflows/set_env.py
+          .github/workflows/set_env.py -w
+
+      - name: Install workflow
+        run: |
+          sudo -E .github/workflows/installation.py
 
       - name: Create Pull Request (Staging)
         uses: repo-sync/pull-request@v2
@@ -39,6 +44,10 @@ jobs:
           destination_branch: "release"
           github_token: ${{ secrets.GITHUB_TOKEN }}
           pr_title: "release <- ${BRANCH_NAME}: ${COMMIT_TITLE}"
+
+      - name: Run style check
+        run: |
+          ./bin/checkstyle.py
 
       - name: Publish if version has been updated (set up nodejs)
         uses: actions/setup-node@v1
