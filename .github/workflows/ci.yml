@@ -51,6 +51,7 @@ jobs:
           npm install
 
       - name: Bump version and create PRs
+        if: env.BRANCH_NAME == 'staging'
         run: |
           .github/workflows/bump_version.py -m --push <<< ${{ github.token }}
 
