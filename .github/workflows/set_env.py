@@ -2,7 +2,7 @@
 
 import os
 from subprocess import CalledProcessError, run
-from typing import Dict, List
+from typing import Dict, List, Union
 import json
 
 import click
@@ -45,7 +45,7 @@ def git_short_sha() -> str:
     return os.environ["GITHUB_SHA"][:7]
 
 
-def is_dev_branch() -> str:
+def is_dev_branch() -> bool:
     return git_branch_name() not in ["release", "staging"]
 
 
@@ -71,7 +71,15 @@ def package_version() -> str:
     return package["version"]
 
 
-def get_env() -> Dict[str, str]:
+def pr_body() -> str:
+    if target_branch() == "staging":
+        return 'To merge into the staging branch, please use "Rebase and merge", or "Squash and merge".'
+    elif target_branch == "release":
+        return 'To merge into the release branch, please use "Create a merge commit".'
+    return ""
+
+
+def get_env() -> Dict[str, Union[str, bool]]:
     return {
         "PROJECT_NAME": github_repo_name(),
         "DOCKER_TAG": docker_tag(),
@@ -82,6 +90,7 @@ def get_env() -> Dict[str, str]:
         "COMMIT_TITLE": git_commit_title(),
         "SHOULD_UPLOAD_PACKAGE": should_upload_package(),
         "PACKAGE_VERSION": package_version(),
+        "PR_BODY": pr_body(),
     }
 
 

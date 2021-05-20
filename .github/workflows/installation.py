@@ -28,9 +28,15 @@ def install_prettier():
         run(["npm", "-g", "install", "prettier"])
 
 
+def install_npm_cli_login():
+    if run(["which", "npm-cli-login"]).returncode != 0:
+        run(["npm", "-g", "install", "npm-cli-login"])
+
+
 if __name__ == "__main__":
     install_black()
     install_flake8()
     install_node()
     install_npm()
     install_prettier()
+    install_npm_cli_login()
