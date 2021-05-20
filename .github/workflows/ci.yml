@@ -29,8 +29,9 @@ jobs:
 
       - name: Set up env vars
         run: |
-          set_env.py
-          set_env.py -w
+          .github/workflows/set_env.py
+          .github/workflows/set_env.py -w
+
       - name: Install workflow
         run: |
           sudo -E installation.py
