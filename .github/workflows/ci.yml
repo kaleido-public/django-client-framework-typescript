@@ -6,6 +6,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
+    env:
+      NPM_USER: ylilarry
+      NPM_PASS: ${{ secrets.YLILARRY_NPM_PASSWD }}
+      NPM_EMAIL: ylilarry@gmail.com
+      DOCKER_LOGIN_PASSWD: ${{ secrets.YLILARRY_DOCKERHUB_TOKEN }}
+
     steps:
       - name: Display runner status
         run: |
@@ -23,46 +29,31 @@ jobs:
 
       - name: Set up env vars
         run: |
-          .github/workflows/set_env
+          .github/workflows/set_env.py
+          .github/workflows/set_env.py -w
 
-      - name: Create Pull Request (Staging)
-        uses: repo-sync/pull-request@v2
-        with:
-          destination_branch: "staging"
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          pr_title: "staging <- ${BRANCH_NAME}: ${COMMIT_TITLE}"
+      - name: Install workflow
+        run: |
+          sudo -E .github/workflows/installation.py
 
-      - name: Create Pull Request (Release)
-        if: env.BRANCH_NAME == 'staging'
-        uses: repo-sync/pull-request@v2
-        with:
-          destination_branch: "release"
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          pr_title: "release <- ${BRANCH_NAME}: ${COMMIT_TITLE}"
+      - name: Create PR
+        if: env.IS_DEV_BRANCH == 'True' || env.BRANCH_NAME == 'staging'
+        run: |
+          gh auth login --with-token <<< "${{ github.token }}"
+          gh pr create --title "${TARGET_BRANCH} <- ${BRANCH_NAME}: ${COMMIT_TITLE}" --base ${TARGET_BRANCH} --body "${PR_BODY}" || true # ignore PR already exists error
 
-      - name: Publish if version has been updated (set up nodejs)
-        uses: actions/setup-node@v1
-        if: env.SHOULD_UPLOAD_PACKAGE == 'True'
-        with:
-          node-version: 10
+      - name: Run style check
+        run: |
+          ./bin/checkstyle.py
 
-      - name: Publish if version has been updated (npm install)
-        if: env.SHOULD_UPLOAD_PACKAGE == 'True'
-        run: npm install
+      - name: Build Package
+        run: |
+          npm install
 
-      - name: Publish if version has been updated (npm publish)
+      - name: Publish package
         if: env.SHOULD_UPLOAD_PACKAGE == 'True'
         run: |
-          npm install -g npm-cli-login
           npm-cli-login
           npm publish
-        env:
-          NPM_USER: ylilarry
-          NPM_PASS: ${{ secrets.YLILARRY_NPM_PASSWD }}
-          NPM_EMAIL: ylilarry@gmail.com
-
-      - name: Publish if version has been updated (git tag)
-        if: env.SHOULD_UPLOAD_PACKAGE == 'True'
-        run: |
           git tag v${PACKAGE_VERSION}
           git push --tag
