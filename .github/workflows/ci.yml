@@ -34,7 +34,7 @@ jobs:
 
       - name: Install workflow
         run: |
-          sudo -E installation.py
+          sudo -E .github/workflows/installation.py
 
       - name: Create PR
         if: env.IS_DEV_BRANCH == 'True' || env.BRANCH_NAME == 'staging'
