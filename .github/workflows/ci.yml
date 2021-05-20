@@ -31,7 +31,6 @@ jobs:
         run: |
           .github/workflows/set_env.py
           .github/workflows/set_env.py -w
-
       - name: Install workflow
         run: |
           sudo -E .github/workflows/installation.py
