@@ -4,12 +4,18 @@ import os
 from subprocess import CalledProcessError, run
 from typing import Dict, List, Union
 import json
+from pathlib import Path
 
 import click
 
+__dir__ = Path(__file__).parent.absolute()
 
-def github_repo_name():
-    return os.environ["GITHUB_REPOSITORY"].split("/")[1]
+
+def github_repo_name() -> str:
+    if repo_full := os.environ.get("GITHUB_REPOSITORY"):
+        return repo_full.split("/")[1]
+    else:
+        return ""
 
 
 def git_list_changes() -> List[str]:
@@ -22,7 +28,10 @@ def git_list_changes() -> List[str]:
 
 
 def git_branch_name() -> str:
-    return os.environ["GITHUB_REF"][len("refs/heads/") :]
+    if fullref := os.environ.get("GITHUB_REF", ""):
+        return fullref[len("refs/heads/") :]
+    else:
+        return ""
 
 
 def target_branch() -> str:
@@ -42,7 +51,10 @@ def git_commit_title() -> str:
 
 
 def git_short_sha() -> str:
-    return os.environ["GITHUB_SHA"][:7]
+    if fullsha := os.environ.get("GITHUB_SHA", ""):
+        return fullsha[:7]
+    else:
+        return ""
 
 
 def is_dev_branch() -> bool:
@@ -79,6 +91,15 @@ def pr_body() -> str:
     return ""
 
 
+def overwrite_path() -> str:
+    return ":".join(
+        [
+            os.environ["PATH"],
+            str(__dir__),
+        ]
+    )
+
+
 def get_env() -> Dict[str, Union[str, bool]]:
     return {
         "PROJECT_NAME": github_repo_name(),
@@ -90,6 +111,7 @@ def get_env() -> Dict[str, Union[str, bool]]:
         "COMMIT_TITLE": git_commit_title(),
         "SHOULD_UPLOAD_PACKAGE": should_upload_package(),
         "PACKAGE_VERSION": package_version(),
+        "PATH": overwrite_path(),
         "PR_BODY": pr_body(),
     }
 
@@ -99,7 +121,7 @@ def get_env() -> Dict[str, Union[str, bool]]:
 def main(write):
     content = ""
     for key, val in get_env().items():
-        content += f"{key}={val}\n"
+        content += f"{key}={val.__repr__()}\n"
     if write:
         with open(os.environ["GITHUB_ENV"], "a") as env_file:
             env_file.write(content)
