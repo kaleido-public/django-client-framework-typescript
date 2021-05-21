@@ -39,7 +39,11 @@ jobs:
       - name: Create PR
         if: env.IS_DEV_BRANCH == 'True' || env.BRANCH_NAME == 'staging'
         run: |
-          .github/workflows/create_pr.py --title "${TARGET_BRANCH} <- ${BRANCH_NAME}: ${COMMIT_TITLE}" --base ${TARGET_BRANCH} --body "${PR_BODY}" <<< "${{ github.token }}"
+          .github/workflows/create_pr.py \
+            --head ${BRANCH_NAME} \
+            --base ${TARGET_BRANCH} \
+            --title "${TARGET_BRANCH} <- ${BRANCH_NAME}: ${COMMIT_TITLE}" \
+            --body "${PR_BODY}" <<< "${{ github.token }}"
 
       - name: Run style check
         run: |
