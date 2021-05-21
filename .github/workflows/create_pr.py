@@ -30,25 +30,26 @@ def main(head, base, title, body, repo):
             body,
         ]
     )
-    if create_pr.returncode != 0:
-        run(["gh", "pr", "reopen", head, "--repo", repo])
-        run(
-            [
-                "gh",
-                "pr",
-                "edit",
-                head,
-                "--repo",
-                repo,
-                "--base",
-                base,
-                "--title",
-                title,
-                "--body",
-                body,
-            ],
-            check=True,
-        )
+    if create_pr.returncode != 0:  # might be a closed pr
+        reopen_pr = run(["gh", "pr", "reopen", head, "--repo", repo])
+        if reopen_pr.returncode == 0:  # only edit if the pr has been closed
+            run(
+                [
+                    "gh",
+                    "pr",
+                    "edit",
+                    head,
+                    "--repo",
+                    repo,
+                    "--base",
+                    base,
+                    "--title",
+                    title,
+                    "--body",
+                    body,
+                ],
+                check=True,
+            )
 
 
 if __name__ == "__main__":
