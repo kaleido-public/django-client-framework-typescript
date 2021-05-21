@@ -58,8 +58,6 @@ jobs:
         if: env.BRANCH_NAME == 'staging'
         run: |
           .github/workflows/bump_version.py -m --push <<< ${{ github.token }}
-          .github/workflows/bump_version.py -M --push <<< ${{ github.token }}
-          .github/workflows/bump_version.py -p --push <<< ${{ github.token }}
 
       - name: Publish package
         if: env.SHOULD_UPLOAD_PACKAGE == 'True'
