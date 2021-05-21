@@ -5,15 +5,14 @@ from subprocess import CalledProcessError, run
 
 
 @click.command()
-@click.option("--head", required=True)
-@click.option("--title", required=True)
-@click.option("--base", required=True)
-@click.option("--body", required=True)
-@click.option("--repo", required=True)
+@click.option("--head", required=True, type=str)
+@click.option("--title", required=True, type=str)
+@click.option("--base", required=True, type=str)
+@click.option("--body", required=True, type=str)
+@click.option("--repo", required=True, type=str)
 def main(head, base, title, body, repo):
-    print("Input your github token:")
-    print("> ", end="", flush=True)
-    run(["gh", "auth", "login", "--with-token"], check=True)
+    token = input("Input your github token:\n> ")
+    run(["gh", "auth", "login", "--with-token"], check=True, input=token, text=True)
     create_pr = run(
         [
             "gh",
