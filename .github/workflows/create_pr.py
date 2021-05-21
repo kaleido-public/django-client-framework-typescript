@@ -9,7 +9,8 @@ from subprocess import CalledProcessError, run
 @click.option("--title", required=True)
 @click.option("--base", required=True)
 @click.option("--body", required=True)
-def main(head, base, title, body):
+@click.option("--repo", required=True)
+def main(head, base, title, body, repo):
     print("Input your github token:")
     print("> ", end="", flush=True)
     run(["gh", "auth", "login", "--with-token"], check=True)
@@ -18,6 +19,8 @@ def main(head, base, title, body):
             "gh",
             "pr",
             "create",
+            "--repo",
+            repo,
             "--base",
             base,
             "--head",
@@ -29,13 +32,15 @@ def main(head, base, title, body):
         ]
     )
     if create_pr.returncode != 0:
-        run(["gh", "pr", "reopen", head])
+        run(["gh", "pr", "reopen", head, "--repo", repo])
         run(
             [
                 "gh",
                 "pr",
                 "edit",
                 head,
+                "--repo",
+                repo,
                 "--base",
                 base,
                 "--title",
