@@ -121,7 +121,10 @@ def get_env() -> Dict[str, Union[str, bool]]:
 def main(write):
     content = ""
     for key, val in get_env().items():
-        content += f"{key}={val.__repr__()}\n"
+        if write:
+            content += f"{key}={val}\n"
+        else:
+            content += f"{key}={val.__repr__()}\n"
     if write:
         with open(os.environ["GITHUB_ENV"], "a") as env_file:
             env_file.write(content)
