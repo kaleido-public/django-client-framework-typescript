@@ -39,8 +39,12 @@ jobs:
       - name: Create PR
         if: env.IS_DEV_BRANCH == 'True' || env.BRANCH_NAME == 'staging'
         run: |
-          gh auth login --with-token <<< "${{ github.token }}"
-          gh pr create --title "${TARGET_BRANCH} <- ${BRANCH_NAME}: ${COMMIT_TITLE}" --base ${TARGET_BRANCH} --body "${PR_BODY}" || true # ignore PR already exists error
+          .github/workflows/create_pr.py \
+            --repo ${GITHUB_REPOSITORY} \
+            --head ${BRANCH_NAME} \
+            --base ${TARGET_BRANCH} \
+            --title "${TARGET_BRANCH} <- ${BRANCH_NAME}: ${COMMIT_TITLE}" \
+            --body "${PR_BODY}" <<< ${{ github.token }}
 
       - name: Run style check
         run: |
@@ -49,6 +53,11 @@ jobs:
       - name: Build Package
         run: |
           npm install
+
+      - name: Bump version and create PRs
+        if: env.BRANCH_NAME == 'staging'
+        run: |
+          .github/workflows/bump_version.py -m --push <<< ${{ github.token }}
 
       - name: Publish package
         if: env.SHOULD_UPLOAD_PACKAGE == 'True'
