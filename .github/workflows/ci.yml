@@ -1,0 +1,68 @@
+on:
+  push:
+
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    env:
+      NPM_USER: ylilarry
+      NPM_PASS: ${{ secrets.YLILARRY_NPM_PASSWD }}
+      NPM_EMAIL: ylilarry@gmail.com
+      DOCKER_LOGIN_PASSWD: ${{ secrets.YLILARRY_DOCKERHUB_TOKEN }}
+
+    steps:
+      - name: Display runner status
+        run: |
+          echo "hostname -f: $(hostname -f)"
+          echo "whoami: $(whoami)"
+          echo "pwd: $(pwd)"
+
+      - name: Run git checkout
+        uses: actions/checkout@v2
+        with:
+          lfs: true
+          clean: true
+          fetch-depth: 2
+          submodules: recursive
+
+      - name: Set up env vars
+        run: |
+          .github/workflows/set_env.py
+          .github/workflows/set_env.py -w
+
+      - name: Install workflow
+        run: |
+          sudo -E .github/workflows/installation.py
+
+      - name: Create PR
+        if: env.IS_DEV_BRANCH == 'True' || env.BRANCH_NAME == 'staging'
+        run: |
+          .github/workflows/create_pr.py \
+            --repo ${GITHUB_REPOSITORY} \
+            --head ${BRANCH_NAME} \
+            --base ${TARGET_BRANCH} \
+            --title "${TARGET_BRANCH} <- ${BRANCH_NAME}: ${COMMIT_TITLE}" \
+            --body "${PR_BODY}" <<< ${{ github.token }}
+
+      - name: Run style check
+        run: |
+          ./bin/checkstyle.py
+
+      - name: Build Package
+        run: |
+          npm install
+
+      - name: Bump version and create PRs
+        if: env.BRANCH_NAME == 'staging'
+        run: |
+          .github/workflows/bump_version.py -m --push <<< ${{ github.token }}
+
+      - name: Publish package
+        if: env.SHOULD_UPLOAD_PACKAGE == 'True'
+        run: |
+          npm-cli-login
+          npm publish
+          git tag v${PACKAGE_VERSION}
+          git push --tag
