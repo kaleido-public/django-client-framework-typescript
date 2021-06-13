@@ -33,8 +33,6 @@ export class RelatedObjectManager<T extends Model, P extends Model> {
     }
 
     async set(val: T): Promise<void> {
-        return Ajax.request_void("PATCH", this.object_url, {
-            [this.parent_key]: val.id,
-        })
+        return Ajax.request_void("PATCH", this.object_url, val.id);
     }
 }
