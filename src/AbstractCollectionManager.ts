@@ -19,8 +19,16 @@ export abstract class AbstractCollectionManager<T extends Model> {
         query?: QueryParams<T>
         page?: PageQuery
     }): Promise<PageResult<T>> {
-        console.log("Hello world from abstract collection manager page");
-        let to_send: any = query
+        let to_send: any = {};
+        for (let key of getKeys(query)) {
+            let val: any = query[key];
+            let key_any: any = key;
+            if (query[key] == null) {
+                key_any += '__isnull';
+                val = true;
+            }
+            to_send[key_any] = val;
+        }
         for (let key of getKeys(page)) {
             to_send[`_${key}`] = page[key]
         }
