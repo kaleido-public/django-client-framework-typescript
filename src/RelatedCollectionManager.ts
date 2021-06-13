@@ -45,7 +45,7 @@ export class RelatedCollectionManager<
 
     async set(objects: T[]): Promise<void> {
         return Ajax.request_void(
-            "PUT",
+            "PATCH",
             this.collection_url,
             objects.map((val) => val.id)
         )
