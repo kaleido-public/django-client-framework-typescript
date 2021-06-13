@@ -57,9 +57,6 @@ export class ObjectManagerImpl<T extends Model> {
         for (const key of getKeys(this.updated)) {
             const a = this.updated[key]
             const b = this.original[key]
-            console.log(`a is ${a}`);
-            console.log(`b is ${b}`);
-            console.log(`truth value is ${a == b}`);
             if (a != b) {
                 to_send[key] = a
             }
