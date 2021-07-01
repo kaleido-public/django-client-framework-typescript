@@ -64,13 +64,13 @@ export class ObjectManagerImpl<T extends Model> {
 
         let model = await Ajax.request_decode(this.T, "PATCH", this.object_url, to_send)
 
-        this.original = model
+        this.original = Object.assign(new this.T(), model)
         this.updated = model
     }
 
     async update(data: Partial<T>): Promise<this> {
         let model = await Ajax.request_decode(this.T, "PATCH", this.object_url, data)
-        this.original = model
+        this.original = Object.assign(new this.T(), model)
         this.updated = model
         return this
     }

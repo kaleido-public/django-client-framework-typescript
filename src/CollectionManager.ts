@@ -56,8 +56,8 @@ export class CollectionManager<T extends Model> extends AbstractCollectionManage
             return this.create({ ...query, ...defaults })
         } else if (page.total === 1) {
             let manager = new ObjectManagerImpl(page.objects[0]) as ObjectManager<T>
-            manager.update(defaults)
-            return manager
+            return manager.update(defaults)
+            // return manager
         } else {
             throw new Error(
                 `.get() must receive exactly 1 object, but got ${page.total}.`

@@ -28,7 +28,7 @@ export class RelatedCollectionManager<
     }
 
     async set_ids(ids: number[]): Promise<void> {
-        return Ajax.request_void("PUT", this.collection_url, ids)
+        return Ajax.request_void("PATCH", this.collection_url, ids)
     }
 
     async remove_ids(ids: number[]): Promise<void> {
@@ -45,7 +45,7 @@ export class RelatedCollectionManager<
 
     async set(objects: T[]): Promise<void> {
         return Ajax.request_void(
-            "PUT",
+            "PATCH",
             this.collection_url,
             objects.map((val) => val.id)
         )
