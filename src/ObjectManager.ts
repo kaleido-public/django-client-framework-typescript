@@ -75,7 +75,7 @@ export class ObjectManagerImpl<T extends Model> {
         return this
     }
 
-    get model(): Model {
+    get model(): T {
         return this.updated
     }
 }
