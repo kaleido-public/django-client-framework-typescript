@@ -151,11 +151,12 @@ var AxiosAjaxDriver = (function () {
         return headers;
     };
     AxiosAjaxDriver.prototype.request = function (method, url, data) {
+        var _a, _b;
         if (data === void 0) { data = {}; }
         return __awaiter(this, void 0, void 0, function () {
             var current_request_id, request, response, error_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0:
                         current_request_id = REQUEST_ID++;
                         url = this.url_prefix + url;
@@ -166,9 +167,9 @@ var AxiosAjaxDriver = (function () {
                             console.error("AxiosAjaxDriver failed to send", current_request_id, method, url, JSON.stringify(data));
                             throw err;
                         }
-                        _a.label = 1;
+                        _c.label = 1;
                     case 1:
-                        _a.trys.push([1, 3, , 4]);
+                        _c.trys.push([1, 3, , 4]);
                         request = {
                             url: url,
                             method: method,
@@ -186,13 +187,17 @@ var AxiosAjaxDriver = (function () {
                         }
                         return [4, axios_1.default(request)];
                     case 2:
-                        response = _a.sent();
+                        response = _c.sent();
                         console.debug("AxiosAjaxDriver received", current_request_id, response.status, response.statusText, JSON.stringify(response.data));
                         return [2, response.data];
                     case 3:
-                        error_1 = _a.sent();
+                        error_1 = _c.sent();
                         console.warn("AxiosAjaxDriver failed to receive", current_request_id, JSON.stringify(error_1));
-                        throw new AxiosAjaxError(error_1);
+                        if (((_a = error_1.response) === null || _a === void 0 ? void 0 : _a.status) === 400) {
+                            throw (_b = error_1.response) === null || _b === void 0 ? void 0 : _b.data;
+                        }
+                        console.error("Axio Error", error_1);
+                        return [3, 4];
                     case 4: return [2];
                 }
             });
