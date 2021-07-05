@@ -144,7 +144,10 @@ class AxiosAjaxDriver implements AjaxDriver {
                 current_request_id,
                 JSON.stringify(error)
             )
-            throw new AxiosAjaxError(error)
+            if (error.response?.status === 400) {
+                throw error.response?.data
+            }
+            console.error("Axio Error", error)
         }
     }
 
