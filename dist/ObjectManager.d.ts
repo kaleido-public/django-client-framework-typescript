@@ -11,6 +11,6 @@ export declare class ObjectManagerImpl<T extends Model> {
     refresh(): Promise<void>;
     save(): Promise<void>;
     update(data: Partial<T>): Promise<this>;
-    get model(): T;
+    get model(): Model;
 }
 //# sourceMappingURL=ObjectManager.d.ts.map
