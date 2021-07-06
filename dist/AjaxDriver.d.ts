@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { Model } from "./Model";
 import { PageResult } from "./PageResult";
 export declare type HttpMethod = "DELETE" | "POST" | "GET" | "PUT" | "PATCH";
@@ -13,9 +14,11 @@ export interface AjaxDriver {
     auth_token: string;
     url_prefix: string;
 }
-export interface AjaxError {
-    readonly json: any;
-    readonly status: number;
+export declare class AjaxError {
+    private error;
+    constructor(error: AxiosError);
+    get json(): unknown;
+    get status(): number | undefined;
 }
 export declare const Ajax: AjaxDriver;
 export {};

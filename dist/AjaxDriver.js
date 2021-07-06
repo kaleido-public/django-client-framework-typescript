@@ -69,17 +69,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Ajax = void 0;
+exports.Ajax = exports.AjaxError = void 0;
 var axios_1 = __importDefault(require("axios"));
 var qs = __importStar(require("qs"));
 var JSONDecoder_1 = require("./JSONDecoder");
 var PageResult_1 = require("./PageResult");
 var REQUEST_ID = 0;
-var AxiosAjaxError = (function () {
-    function AxiosAjaxError(error) {
+var AjaxError = (function () {
+    function AjaxError(error) {
         this.error = error;
     }
-    Object.defineProperty(AxiosAjaxError.prototype, "json", {
+    Object.defineProperty(AjaxError.prototype, "json", {
         get: function () {
             var _a;
             return (_a = this.error.response) === null || _a === void 0 ? void 0 : _a.data;
@@ -87,16 +87,17 @@ var AxiosAjaxError = (function () {
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(AxiosAjaxError.prototype, "status", {
+    Object.defineProperty(AjaxError.prototype, "status", {
         get: function () {
             var _a;
-            return ((_a = this.error.response) === null || _a === void 0 ? void 0 : _a.status) || 0;
+            return (_a = this.error.response) === null || _a === void 0 ? void 0 : _a.status;
         },
         enumerable: false,
         configurable: true
     });
-    return AxiosAjaxError;
+    return AjaxError;
 }());
+exports.AjaxError = AjaxError;
 var AxiosAjaxDriver = (function () {
     function AxiosAjaxDriver() {
         this.global_target_holder = {};
@@ -192,7 +193,7 @@ var AxiosAjaxDriver = (function () {
                     case 3:
                         error_1 = _a.sent();
                         console.warn("AxiosAjaxDriver failed to receive", current_request_id, JSON.stringify(error_1));
-                        throw new AxiosAjaxError(error_1);
+                        throw new AjaxError(error_1);
                     case 4: return [2];
                 }
             });
