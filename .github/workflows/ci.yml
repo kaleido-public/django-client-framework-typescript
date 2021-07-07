@@ -62,7 +62,7 @@ jobs:
       - name: Push dcf-tsclient-test image
         if: env.SHOULD_UPLOAD_IMAGE == 'True'
         run: |
-          docker login --username ${{ github.actor }} --password-stdin <<< "${{ secrets.GITHUB_TOKEN }}"
+          docker login --username ${{ github.actor }} --password-stdin ghcr.io <<< "${{ secrets.GITHUB_TOKEN }}"
           docker tag ghcr.io/kaleido-public/dcf-tsclient-test:local ghcr.io/kaleido-public/dcf-tsclient-test:${BRANCH_NAME}
           docker push ghcr.io/kaleido-public/dcf-tsclient-test:${BRANCH_NAME}
 
