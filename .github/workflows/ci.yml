@@ -59,6 +59,13 @@ jobs:
         run: make
         working-directory: tests
 
+      - name: Push dcf-tsclient-test image
+        if: env.SHOULD_UPLOAD_IMAGE == 'True'
+        run: |
+          docker login --username ${{ github.actor }} --password-stdin <<< "${{ secrets.GITHUB_TOKEN }}"
+          docker tag ${BRANCH_NAME} ghcr.io/kaleido-public/dcf-tsclient-test:local
+          docker push ghcr.io/kaleido-public/dcf-tsclient-test:${BRANCH_NAME}
+
       - name: Publish package
         if: env.SHOULD_UPLOAD_PACKAGE == 'True'
         run: |
@@ -66,6 +73,3 @@ jobs:
           npm publish
           git tag v${PACKAGE_VERSION}
           git push --tag
-          docker login --username ${{ github.actor }} --password-stdin <<< "${{ secrets.GITHUB_TOKEN }}"
-          docker tag ${BRANCH_NAME} ghcr.io/kaleido-public/dcf-tsclient-test:local
-          docker push ghcr.io/kaleido-public/dcf-tsclient-test:${BRANCH_NAME}
