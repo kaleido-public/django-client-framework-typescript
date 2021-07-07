@@ -1,5 +1,4 @@
 import { Ajax } from "./AjaxDriver"
-import { model_name } from "./helpers"
 import { Model } from "./Model"
 import { ObjectManager, ObjectManagerImpl } from "./ObjectManager"
 
@@ -10,7 +9,7 @@ export class RelatedObjectManager<T extends Model, P extends Model> {
     T: new () => T
     constructor(T: new () => T, parent: P, parent_key: string) {
         this.parent_id = parent.id
-        this.parent_model_name = model_name(parent)
+        this.parent_model_name = parent._model_name.toLowerCase()
         this.parent_key = parent_key
         this.T = T
     }

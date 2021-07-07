@@ -80,7 +80,7 @@ var ObjectManagerImpl = (function () {
     }
     Object.defineProperty(ObjectManagerImpl.prototype, "model_name", {
         get: function () {
-            return this.model.constructor.name.toLowerCase();
+            return this.model._model_name.toLowerCase();
         },
         enumerable: false,
         configurable: true

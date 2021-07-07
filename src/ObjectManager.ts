@@ -35,7 +35,7 @@ export class ObjectManagerImpl<T extends Model> {
     }
 
     get model_name(): string {
-        return this.model.constructor.name.toLowerCase()
+        return this.model._model_name.toLowerCase()
     }
 
     get object_url(): string {
