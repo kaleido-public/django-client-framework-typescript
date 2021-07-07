@@ -1,6 +1,5 @@
 import { Ajax } from "./AjaxDriver"
 import { Model } from "./Model"
-import { model_name } from "./helpers"
 import { ObjectManager, ObjectManagerImpl } from "./ObjectManager"
 import { AbstractCollectionManager } from "./AbstractCollectionManager"
 
@@ -11,8 +10,13 @@ export class CollectionManager<T extends Model> extends AbstractCollectionManage
         this.T = T
     }
 
+    get model_name(): string {
+        let object = new this.T()
+        return object._model_name.toLowerCase()
+    }
+
     get collection_url(): string {
-        return `/${model_name(this.T)}`
+        return `/${this.model_name}`
     }
 
     async create(data: Partial<T>): Promise<ObjectManager<T>> {

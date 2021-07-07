@@ -69,17 +69,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Ajax = void 0;
+exports.Ajax = exports.AjaxError = void 0;
 var axios_1 = __importDefault(require("axios"));
 var qs = __importStar(require("qs"));
 var JSONDecoder_1 = require("./JSONDecoder");
 var PageResult_1 = require("./PageResult");
 var REQUEST_ID = 0;
-var AxiosAjaxError = (function () {
-    function AxiosAjaxError(error) {
+var AjaxError = (function () {
+    function AjaxError(error) {
         this.error = error;
     }
-    Object.defineProperty(AxiosAjaxError.prototype, "json", {
+    Object.defineProperty(AjaxError.prototype, "json", {
         get: function () {
             var _a;
             return (_a = this.error.response) === null || _a === void 0 ? void 0 : _a.data;
@@ -87,16 +87,17 @@ var AxiosAjaxError = (function () {
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(AxiosAjaxError.prototype, "status", {
+    Object.defineProperty(AjaxError.prototype, "status", {
         get: function () {
             var _a;
-            return ((_a = this.error.response) === null || _a === void 0 ? void 0 : _a.status) || 0;
+            return (_a = this.error.response) === null || _a === void 0 ? void 0 : _a.status;
         },
         enumerable: false,
         configurable: true
     });
-    return AxiosAjaxError;
+    return AjaxError;
 }());
+exports.AjaxError = AjaxError;
 var AxiosAjaxDriver = (function () {
     function AxiosAjaxDriver() {
         this.global_target_holder = {};
@@ -151,12 +152,11 @@ var AxiosAjaxDriver = (function () {
         return headers;
     };
     AxiosAjaxDriver.prototype.request = function (method, url, data) {
-        var _a, _b;
         if (data === void 0) { data = {}; }
         return __awaiter(this, void 0, void 0, function () {
             var current_request_id, request, response, error_1;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0:
                         current_request_id = REQUEST_ID++;
                         url = this.url_prefix + url;
@@ -167,9 +167,9 @@ var AxiosAjaxDriver = (function () {
                             console.error("AxiosAjaxDriver failed to send", current_request_id, method, url, JSON.stringify(data));
                             throw err;
                         }
-                        _c.label = 1;
+                        _a.label = 1;
                     case 1:
-                        _c.trys.push([1, 3, , 4]);
+                        _a.trys.push([1, 3, , 4]);
                         request = {
                             url: url,
                             method: method,
@@ -187,17 +187,13 @@ var AxiosAjaxDriver = (function () {
                         }
                         return [4, axios_1.default(request)];
                     case 2:
-                        response = _c.sent();
+                        response = _a.sent();
                         console.debug("AxiosAjaxDriver received", current_request_id, response.status, response.statusText, JSON.stringify(response.data));
                         return [2, response.data];
                     case 3:
-                        error_1 = _c.sent();
+                        error_1 = _a.sent();
                         console.warn("AxiosAjaxDriver failed to receive", current_request_id, JSON.stringify(error_1));
-                        if (((_a = error_1.response) === null || _a === void 0 ? void 0 : _a.status) === 400) {
-                            throw (_b = error_1.response) === null || _b === void 0 ? void 0 : _b.data;
-                        }
-                        console.error("Axio Error", error_1);
-                        return [3, 4];
+                        throw new AjaxError(error_1);
                     case 4: return [2];
                 }
             });

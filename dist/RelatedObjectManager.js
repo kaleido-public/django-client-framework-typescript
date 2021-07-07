@@ -38,12 +38,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RelatedObjectManager = void 0;
 var AjaxDriver_1 = require("./AjaxDriver");
-var helpers_1 = require("./helpers");
 var ObjectManager_1 = require("./ObjectManager");
 var RelatedObjectManager = (function () {
     function RelatedObjectManager(T, parent, parent_key) {
         this.parent_id = parent.id;
-        this.parent_model_name = helpers_1.model_name(parent);
+        this.parent_model_name = parent._model_name.toLowerCase();
         this.parent_key = parent_key;
         this.T = T;
     }

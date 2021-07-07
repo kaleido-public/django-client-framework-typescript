@@ -1,6 +1,5 @@
 import { Ajax } from "./AjaxDriver"
 import { Model } from "./Model"
-import { model_name } from "./helpers"
 import { AbstractCollectionManager } from "./AbstractCollectionManager"
 
 export class RelatedCollectionManager<
@@ -14,7 +13,7 @@ export class RelatedCollectionManager<
     constructor(T: new () => T, parent: P, parent_key: string) {
         super()
         this.parent_id = parent.id
-        this.parent_model_name = model_name(parent)
+        this.parent_model_name = parent._model_name.toLocaleLowerCase()
         this.parent_key = parent_key
         this.T = T
     }

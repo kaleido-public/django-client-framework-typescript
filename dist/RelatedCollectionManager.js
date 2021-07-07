@@ -53,14 +53,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RelatedCollectionManager = void 0;
 var AjaxDriver_1 = require("./AjaxDriver");
-var helpers_1 = require("./helpers");
 var AbstractCollectionManager_1 = require("./AbstractCollectionManager");
 var RelatedCollectionManager = (function (_super) {
     __extends(RelatedCollectionManager, _super);
     function RelatedCollectionManager(T, parent, parent_key) {
         var _this = _super.call(this) || this;
         _this.parent_id = parent.id;
-        _this.parent_model_name = helpers_1.model_name(parent);
+        _this.parent_model_name = parent._model_name.toLocaleLowerCase();
         _this.parent_key = parent_key;
         _this.T = T;
         return _this;

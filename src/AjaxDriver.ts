@@ -36,18 +36,13 @@ export interface AjaxDriver {
     url_prefix: string
 }
 
-export interface AjaxError {
-    readonly json: any
-    readonly status: number
-}
-
-class AxiosAjaxError implements AjaxError {
+export class AjaxError {
     constructor(private error: AxiosError) {}
-    get json(): any {
+    get json(): unknown {
         return this.error.response?.data
     }
-    get status(): number {
-        return this.error.response?.status || 0
+    get status(): number | undefined {
+        return this.error.response?.status
     }
 }
 
@@ -144,10 +139,7 @@ class AxiosAjaxDriver implements AjaxDriver {
                 current_request_id,
                 JSON.stringify(error)
             )
-            if (error.response?.status === 400) {
-                throw error.response?.data
-            }
-            console.error("Axio Error", error)
+            throw new AjaxError(error)
         }
     }
 

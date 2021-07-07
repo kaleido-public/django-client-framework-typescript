@@ -64,7 +64,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CollectionManager = void 0;
 var AjaxDriver_1 = require("./AjaxDriver");
-var helpers_1 = require("./helpers");
 var ObjectManager_1 = require("./ObjectManager");
 var AbstractCollectionManager_1 = require("./AbstractCollectionManager");
 var CollectionManager = (function (_super) {
@@ -74,9 +73,17 @@ var CollectionManager = (function (_super) {
         _this.T = T;
         return _this;
     }
+    Object.defineProperty(CollectionManager.prototype, "model_name", {
+        get: function () {
+            var object = new this.T();
+            return object._model_name.toLowerCase();
+        },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(CollectionManager.prototype, "collection_url", {
         get: function () {
-            return "/" + helpers_1.model_name(this.T);
+            return "/" + this.model_name;
         },
         enumerable: false,
         configurable: true
