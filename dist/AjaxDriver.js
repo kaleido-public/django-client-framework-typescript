@@ -154,7 +154,7 @@ var AxiosAjaxDriver = (function () {
     AxiosAjaxDriver.prototype.request = function (method, url, data) {
         if (data === void 0) { data = {}; }
         return __awaiter(this, void 0, void 0, function () {
-            var current_request_id, request, response, error_1;
+            var current_request_id, request, response, error_1, ajaxError;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -193,7 +193,9 @@ var AxiosAjaxDriver = (function () {
                     case 3:
                         error_1 = _a.sent();
                         console.warn("AxiosAjaxDriver failed to receive", current_request_id, JSON.stringify(error_1));
-                        throw new AjaxError(error_1);
+                        ajaxError = new AjaxError(error_1);
+                        console.warn("Error JSON:", ajaxError.json);
+                        throw ajaxError;
                     case 4: return [2];
                 }
             });

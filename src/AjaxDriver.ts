@@ -139,7 +139,9 @@ class AxiosAjaxDriver implements AjaxDriver {
                 current_request_id,
                 JSON.stringify(error)
             )
-            throw new AjaxError(error)
+            let ajaxError = new AjaxError(error)
+            console.warn("Error JSON:", ajaxError.json)
+            throw ajaxError
         }
     }
 
