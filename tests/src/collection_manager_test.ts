@@ -2,17 +2,12 @@ import { assert, expect } from "chai"
 import { CollectionManager, Ajax } from "django-client-framework"
 import Axios from "axios"
 import { Product } from "./models/Product"
-import { Brand } from "./models/Brand"
 
 Ajax.url_prefix = "http://server:8000"
 
 describe("collection manager tests", () => {
     beforeEach(async () => {
         // Axios.defaults = {...Axios.defaults, baseURL: "http://server:8000"}
-        await Axios.get("http://server:8000/subapp/clear")
-    })
-
-    afterEach(async () => {
         await Axios.get("http://server:8000/subapp/clear")
     })
 
@@ -205,6 +200,21 @@ describe("collection manager tests", () => {
         assert.equal(pr.objects.length, 1)
         assert.equal(pr.objects[0].id, 5)
         expect(pr.objects[0].barcode).to.equal("product 5")
+    })
+
+    it("test page query with empty array params", async () => {
+        var cm = new CollectionManager(Product)
+        for (let i = 0; i < 10; i++) {
+            await cm.create({ barcode: `product ${i + 1}` })
+        }
+
+        var pr = await cm.page({
+            query: {
+                id__in: [], // this must be encoded to "?id__in[]="
+            },
+        })
+        assert.equal(pr.page, 1)
+        assert.equal(pr.total, 0)
     })
 
     it("test page query with page", async () => {

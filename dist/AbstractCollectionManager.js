@@ -65,8 +65,11 @@ var AbstractCollectionManager = (function () {
                     for (_d = __values(helpers_1.getKeys(query)), _e = _d.next(); !_e.done; _e = _d.next()) {
                         key = _e.value;
                         val = query[key];
+                        if (Array.isArray(val) && val.length == 0) {
+                            val = [null];
+                        }
                         key_any = key;
-                        if (query[key] == null) {
+                        if (val == null) {
                             key_any += "__isnull";
                             val = true;
                         }

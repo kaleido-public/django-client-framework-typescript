@@ -22,8 +22,12 @@ export abstract class AbstractCollectionManager<T extends Model> {
         let to_send: any = {}
         for (let key of getKeys(query)) {
             let val: any = query[key]
+            if (Array.isArray(val) && val.length == 0) {
+                val = [null] // the qs.stringify function requires the empty array to be passed as [null]
+            }
             let key_any: any = key
-            if (query[key] == null) {
+            if (val == null) {
+                // translates something like {foo: null} to {foo__isnull: true}
                 key_any += "__isnull"
                 val = true
             }
