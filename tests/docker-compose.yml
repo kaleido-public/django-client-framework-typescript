@@ -1,9 +1,13 @@
 version: "3"
 services:
   test:
-    image: ghcr.io/kaleido-public/dcf-tsclient-test:local
     build:
       context: ..
-      dockerfile: tests/Dockerfile
+      dockerfile: tests/tsclient.dockerfile
   server:
-    image: ghcr.io/kaleido-public/dcf-clients-test-server:staging
+    build:
+      context: .
+      dockerfile: ./server.dockerfile
+      args:
+        DCF_BRANCH: staging
+        TEST_SERVER_BRANCH: master
