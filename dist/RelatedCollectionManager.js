@@ -95,21 +95,21 @@ var RelatedCollectionManager = (function (_super) {
     RelatedCollectionManager.prototype.add = function (objects) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2, AjaxDriver_1.Ajax.request_void("POST", this.collection_url, objects.map(function (val) { return val.id; }))];
+                return [2, this.add_ids(objects.map(function (val) { return val.id; }))];
             });
         });
     };
     RelatedCollectionManager.prototype.set = function (objects) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2, AjaxDriver_1.Ajax.request_void("PATCH", this.collection_url, objects.map(function (val) { return val.id; }))];
+                return [2, this.set_ids(objects.map(function (val) { return val.id; }))];
             });
         });
     };
     RelatedCollectionManager.prototype.remove = function (objects) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2, AjaxDriver_1.Ajax.request_void("DELETE", this.collection_url, objects.map(function (val) { return val.id; }))];
+                return [2, this.remove_ids(objects.map(function (val) { return val.id; }))];
             });
         });
     };

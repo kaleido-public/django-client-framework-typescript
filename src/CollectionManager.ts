@@ -37,13 +37,13 @@ export class CollectionManager<T extends Model> extends AbstractCollectionManage
         defaults?: Partial<T>
     }): Promise<ObjectManager<T>> {
         let page = await this.page({ query: query, page: { limit: 2 } })
-        if (page.total === 0) {
+        if (page.objects_count === 0) {
             return this.create({ ...query, ...defaults })
-        } else if (page.total === 1) {
+        } else if (page.objects_count === 1) {
             return new ObjectManagerImpl(page.objects[0]) as ObjectManager<T>
         } else {
             throw new Error(
-                `.get() must receive exactly 1 object, but got ${page.total}.`
+                `.get() must receive exactly 1 object, but got ${page.objects_count}.`
             )
         }
     }
@@ -56,15 +56,15 @@ export class CollectionManager<T extends Model> extends AbstractCollectionManage
         defaults?: Partial<T>
     }): Promise<ObjectManager<T>> {
         let page = await this.page({ query: query, page: { limit: 2 } })
-        if (page.total === 0) {
+        if (page.objects_count === 0) {
             return this.create({ ...query, ...defaults })
-        } else if (page.total === 1) {
+        } else if (page.objects_count === 1) {
             let manager = new ObjectManagerImpl(page.objects[0]) as ObjectManager<T>
             return manager.update(defaults)
             // return manager
         } else {
             throw new Error(
-                `.get() must receive exactly 1 object, but got ${page.total}.`
+                `.get() must receive exactly 1 object, but got ${page.objects_count}.`
             )
         }
     }

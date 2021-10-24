@@ -1,7 +1,7 @@
 import { Model } from "./Model";
 import { ObjectManager } from "./ObjectManager";
 export declare class RelatedObjectManager<T extends Model, P extends Model> {
-    parent_id: number;
+    parent_id: number | string;
     parent_key: string;
     parent_model_name: string;
     T: new () => T;

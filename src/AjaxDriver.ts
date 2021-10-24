@@ -3,7 +3,10 @@ import * as qs from "qs"
 import { JSONDecoder } from "./JSONDecoder"
 import { Model } from "./Model"
 import { PageResult } from "./PageResult"
+import { getLogger } from "loglevel"
 
+const log = getLogger("AjaxDriver.ts")
+export { log as AjaxDriverLogger }
 export type HttpMethod = "DELETE" | "POST" | "GET" | "PUT" | "PATCH"
 
 let REQUEST_ID = 0
@@ -37,12 +40,12 @@ export interface AjaxDriver {
 }
 
 export class AjaxError {
-    constructor(private error: AxiosError) {}
+    constructor(public axioError: AxiosError) {}
     get json(): unknown {
-        return this.error.response?.data
+        return this.axioError.response?.data
     }
     get status(): number | undefined {
-        return this.error.response?.status
+        return this.axioError.response?.status
     }
 }
 
@@ -91,57 +94,43 @@ class AxiosAjaxDriver implements AjaxDriver {
     async request(method: HttpMethod, url: string, data: any = {}): Promise<any> {
         const current_request_id = REQUEST_ID++
         url = this.url_prefix + url
-        try {
-            console.debug(
-                "AxiosAjaxDriver sent",
-                current_request_id,
-                method,
-                url,
-                JSON.stringify(data)
-            )
-        } catch (err) {
-            console.error(
-                "AxiosAjaxDriver failed to send",
-                current_request_id,
-                method,
-                url,
-                JSON.stringify(data)
-            )
-            throw err
+        log.debug("AxiosAjaxDriver sent", current_request_id, method, url, data)
+        let request: AxiosRequestConfig = {
+            url: url,
+            method: method,
+            headers: this.get_headers(),
+            timeout: 30 * 1000,
+            paramsSerializer: function (params: any) {
+                return qs.stringify(params, { arrayFormat: "brackets" })
+            },
+        }
+        if (typeof data == "string") {
+            // need to turn "abc" into '"abc"'
+            data = JSON.stringify(data)
+        }
+        if (method == "GET") {
+            request = { ...request, params: data }
+        } else {
+            request = { ...request, data: data }
         }
         try {
-            let request: AxiosRequestConfig = {
-                url: url,
-                method: method,
-                headers: this.get_headers(),
-                timeout: 30 * 1000,
-                paramsSerializer: function (params: any) {
-                    return qs.stringify(params, { arrayFormat: "brackets" })
-                },
-            }
-            if (method == "GET") {
-                request = { ...request, params: data }
-            } else {
-                request = { ...request, data: data }
-            }
             const response = await axios(request)
-            console.debug(
+            log.debug(
                 "AxiosAjaxDriver received",
                 current_request_id,
                 response.status,
                 response.statusText,
-                JSON.stringify(response.data)
+                response.data
             )
             return response.data
-        } catch (error) {
-            console.warn(
-                "AxiosAjaxDriver failed to receive",
+        } catch (error: any) {
+            let axioError: AxiosError = error
+            log.warn(
+                "AxiosAjaxDriver received error",
                 current_request_id,
-                JSON.stringify(error)
+                axioError.response?.data
             )
-            let ajaxError = new AjaxError(error)
-            console.warn("Error JSON:", ajaxError.json)
-            throw ajaxError
+            throw new AjaxError(error)
         }
     }
 

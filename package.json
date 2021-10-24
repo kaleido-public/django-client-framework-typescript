@@ -22,6 +22,7 @@
   "homepage": "https://github.com/kaleido-public/django-client-framework-typescript#readme",
   "dependencies": {
     "axios": "^0.21.1",
+    "loglevel": "^1.7.1",
     "qs": "^6.9.6"
   },
   "devDependencies": {

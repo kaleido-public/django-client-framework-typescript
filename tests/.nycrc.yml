@@ -1,0 +1,14 @@
+extends: "@istanbuljs/nyc-config-typescript"
+extension:
+  - ".ts"
+  - ".js"
+include:
+  - src/**
+  - node_modules/django-client-framework/**
+excludeNodeModules: false
+reporter:
+  - lcov
+  - text
+  - text-summary
+all: true
+report-dir: /coverage

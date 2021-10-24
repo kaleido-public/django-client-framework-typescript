@@ -3,9 +3,8 @@ import { Model } from "./Model";
 export declare class PageResult<T extends Model> {
     page: number;
     limit: number;
-    total: number;
-    previous: string;
-    next: string;
+    pages_count: number;
+    objects_count: number;
     objects: T[];
     get managers(): ObjectManager<T>[];
 }

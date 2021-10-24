@@ -110,14 +110,14 @@ var CollectionManager = (function (_super) {
                     case 0: return [4, this.page({ query: query, page: { limit: 2 } })];
                     case 1:
                         page = _c.sent();
-                        if (page.total === 0) {
+                        if (page.objects_count === 0) {
                             return [2, this.create(__assign(__assign({}, query), defaults))];
                         }
-                        else if (page.total === 1) {
+                        else if (page.objects_count === 1) {
                             return [2, new ObjectManager_1.ObjectManagerImpl(page.objects[0])];
                         }
                         else {
-                            throw new Error(".get() must receive exactly 1 object, but got " + page.total + ".");
+                            throw new Error(".get() must receive exactly 1 object, but got " + page.objects_count + ".");
                         }
                         return [2];
                 }
@@ -133,15 +133,15 @@ var CollectionManager = (function (_super) {
                     case 0: return [4, this.page({ query: query, page: { limit: 2 } })];
                     case 1:
                         page = _c.sent();
-                        if (page.total === 0) {
+                        if (page.objects_count === 0) {
                             return [2, this.create(__assign(__assign({}, query), defaults))];
                         }
-                        else if (page.total === 1) {
+                        else if (page.objects_count === 1) {
                             manager = new ObjectManager_1.ObjectManagerImpl(page.objects[0]);
                             return [2, manager.update(defaults)];
                         }
                         else {
-                            throw new Error(".get() must receive exactly 1 object, but got " + page.total + ".");
+                            throw new Error(".get() must receive exactly 1 object, but got " + page.objects_count + ".");
                         }
                         return [2];
                 }
