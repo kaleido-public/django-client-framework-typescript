@@ -69,20 +69,23 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Ajax = exports.AjaxError = void 0;
+exports.Ajax = exports.AjaxError = exports.AjaxDriverLogger = void 0;
 var axios_1 = __importDefault(require("axios"));
 var qs = __importStar(require("qs"));
 var JSONDecoder_1 = require("./JSONDecoder");
 var PageResult_1 = require("./PageResult");
+var loglevel_1 = require("loglevel");
+var log = loglevel_1.getLogger("AjaxDriver.ts");
+exports.AjaxDriverLogger = log;
 var REQUEST_ID = 0;
 var AjaxError = (function () {
-    function AjaxError(error) {
-        this.error = error;
+    function AjaxError(axioError) {
+        this.axioError = axioError;
     }
     Object.defineProperty(AjaxError.prototype, "json", {
         get: function () {
             var _a;
-            return (_a = this.error.response) === null || _a === void 0 ? void 0 : _a.data;
+            return (_a = this.axioError.response) === null || _a === void 0 ? void 0 : _a.data;
         },
         enumerable: false,
         configurable: true
@@ -90,7 +93,7 @@ var AjaxError = (function () {
     Object.defineProperty(AjaxError.prototype, "status", {
         get: function () {
             var _a;
-            return (_a = this.error.response) === null || _a === void 0 ? void 0 : _a.status;
+            return (_a = this.axioError.response) === null || _a === void 0 ? void 0 : _a.status;
         },
         enumerable: false,
         configurable: true
@@ -152,24 +155,16 @@ var AxiosAjaxDriver = (function () {
         return headers;
     };
     AxiosAjaxDriver.prototype.request = function (method, url, data) {
+        var _a;
         if (data === void 0) { data = {}; }
         return __awaiter(this, void 0, void 0, function () {
-            var current_request_id, request, response, error_1, ajaxError;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var current_request_id, request, response, error_1, axioError;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
                         current_request_id = REQUEST_ID++;
                         url = this.url_prefix + url;
-                        try {
-                            console.debug("AxiosAjaxDriver sent", current_request_id, method, url, JSON.stringify(data));
-                        }
-                        catch (err) {
-                            console.error("AxiosAjaxDriver failed to send", current_request_id, method, url, JSON.stringify(data));
-                            throw err;
-                        }
-                        _a.label = 1;
-                    case 1:
-                        _a.trys.push([1, 3, , 4]);
+                        log.debug("AxiosAjaxDriver sent", current_request_id, method, url, data);
                         request = {
                             url: url,
                             method: method,
@@ -179,23 +174,28 @@ var AxiosAjaxDriver = (function () {
                                 return qs.stringify(params, { arrayFormat: "brackets" });
                             },
                         };
+                        if (typeof data == "string") {
+                            data = JSON.stringify(data);
+                        }
                         if (method == "GET") {
                             request = __assign(__assign({}, request), { params: data });
                         }
                         else {
                             request = __assign(__assign({}, request), { data: data });
                         }
+                        _b.label = 1;
+                    case 1:
+                        _b.trys.push([1, 3, , 4]);
                         return [4, axios_1.default(request)];
                     case 2:
-                        response = _a.sent();
-                        console.debug("AxiosAjaxDriver received", current_request_id, response.status, response.statusText, JSON.stringify(response.data));
+                        response = _b.sent();
+                        log.debug("AxiosAjaxDriver received", current_request_id, response.status, response.statusText, response.data);
                         return [2, response.data];
                     case 3:
-                        error_1 = _a.sent();
-                        console.warn("AxiosAjaxDriver failed to receive", current_request_id, JSON.stringify(error_1));
-                        ajaxError = new AjaxError(error_1);
-                        console.warn("Error JSON:", ajaxError.json);
-                        throw ajaxError;
+                        error_1 = _b.sent();
+                        axioError = error_1;
+                        log.warn("AxiosAjaxDriver received error", current_request_id, (_a = axioError.response) === null || _a === void 0 ? void 0 : _a.data);
+                        throw new AjaxError(error_1);
                     case 4: return [2];
                 }
             });

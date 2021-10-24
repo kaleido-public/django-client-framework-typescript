@@ -3,7 +3,7 @@ import { Model } from "./Model"
 import { ObjectManager, ObjectManagerImpl } from "./ObjectManager"
 
 export class RelatedObjectManager<T extends Model, P extends Model> {
-    parent_id: number
+    parent_id: number | string
     parent_key: string
     parent_model_name: string
     T: new () => T
@@ -22,7 +22,7 @@ export class RelatedObjectManager<T extends Model, P extends Model> {
         try {
             let model = await Ajax.request_decode(this.T, "GET", this.object_url)
             return new ObjectManagerImpl<T>(model) as any
-        } catch (error) {
+        } catch (error: any) {
             if (error.status === 404) {
                 return null
             } else {
@@ -32,6 +32,6 @@ export class RelatedObjectManager<T extends Model, P extends Model> {
     }
 
     async set(val: T): Promise<void> {
-        return Ajax.request_void("PATCH", this.object_url, val.id.toString())
+        return Ajax.request_void("PATCH", this.object_url, val.id)
     }
 }

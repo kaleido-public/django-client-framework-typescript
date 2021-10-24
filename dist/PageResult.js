@@ -6,9 +6,8 @@ var PageResult = (function () {
     function PageResult() {
         this.page = 0;
         this.limit = 0;
-        this.total = 0;
-        this.previous = "";
-        this.next = "";
+        this.pages_count = 0;
+        this.objects_count = 0;
         this.objects = [];
     }
     Object.defineProperty(PageResult.prototype, "managers", {

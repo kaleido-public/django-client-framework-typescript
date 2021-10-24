@@ -41,9 +41,9 @@ export abstract class AbstractCollectionManager<T extends Model> {
 
     async get(query: QueryParams<T>): Promise<ObjectManager<T>> {
         const page = await this.page({ query: query, page: { limit: 2 } })
-        if (page.total !== 1) {
+        if (page.objects_count !== 1) {
             throw new Error(
-                `.get() must receive exactly 1 object, but got ${page.total}.`
+                `.get() must receive exactly 1 object, but got ${page.objects_count}.`
             )
         }
         return new ObjectManagerImpl(page.objects[0]) as ObjectManager<T>

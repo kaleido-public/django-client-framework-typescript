@@ -16,135 +16,64 @@ describe("object manager tests", () => {
         await Axios.get("http://server:8000/subapp/clear")
     })
 
-    afterEach(async () => {
-        await Axios.get("http://server:8000/subapp/clear")
-    })
-
     it("test refresh", async () => {
-        var cm = new CollectionManager(Product)
-        var om = await cm.create({ barcode: "product 1" })
-
-        await Axios.patch("http://server:8000/product/1", { barcode: "product 2" })
-        expect(om.barcode, "product 1")
-        await om.refresh()
-        expect(om.barcode, "product 2")
-    })
-
-    it("test refresh without updates", async () => {
-        var cm = new CollectionManager(Product)
-        var om = await cm.create({ barcode: "product 1" })
-        await om.refresh()
-        expect(om.barcode).to.equal("product 1")
+        let product = await Product.objects.create({ barcode: "product 1" })
+        await Axios.patch(`http://server:8000/product/${product.id}`, {
+            barcode: "product 2",
+        })
+        expect(product.barcode, "product 1")
+        await product.refresh()
+        expect(product.barcode, "product 2")
     })
 
     it("test save", async () => {
-        var cm = new CollectionManager(Product)
-        var om = await cm.create({ barcode: "product 1" })
-        om.barcode = "osu!"
-        var om1 = await cm.get({ barcode: "product 1" })
-        expect(om1.barcode).to.equal("product 1")
-        await om.save()
-        try {
-            om1 = await cm.get({ barcode: "product 1" })
-            assert.fail("should have failed")
-        } catch (error) {
-            expect(error.message).to.equal(
-                ".get() must receive exactly 1 object, but got 0."
-            )
-        }
-        om1 = await cm.get({ barcode: "osu!" })
-        assert.equal(om1.id, 1)
+        let product = await Product.objects.create({ barcode: "product 1" })
+        product.barcode = "osu!"
+        await product.save()
+        assert.equal(product.barcode, "osu!")
+        let reloaded = await Product.objects.get({ id: product.id })
+        assert.equal(reloaded.barcode, "osu!")
     })
 
     it("test update", async () => {
-        var cm = new CollectionManager(Product)
-        var om = await cm.create({ barcode: "product 1" })
-        await om.update({ barcode: "osu!" })
-        expect(om.barcode).to.equal("osu!")
-        var om1 = await cm.get({ barcode: "osu!" })
-        assert.equal(om1.id, 1)
+        let product = await Product.objects.create({ barcode: "product 1" })
+        await product.update({ barcode: "osu!" })
+        assert.equal(product.barcode, "osu!")
+        let reloaded = await Product.objects.get({ id: product.id })
+        assert.equal(reloaded.barcode, "osu!")
     })
 
     it("test update to empty", async () => {
-        var cm = new CollectionManager(Product)
-        var om = await cm.create({ barcode: "product 1" })
-        await om.update({ barcode: "" })
-        expect(om.barcode).to.equal("")
-        var om1 = await cm.get({ id: 1 })
-        expect(om1.barcode).to.equal("")
+        let product = await Product.objects.create({ barcode: "product 1" })
+        await product.update({ barcode: "" })
+        expect(product.barcode).to.equal("")
+        let product1 = await Product.objects.get({ id: product.id })
+        expect(product1.barcode).to.equal("")
     })
 
     it("test update to null", async () => {
-        var cm = new CollectionManager(Product)
-        var om = await cm.create({ barcode: "product 1" })
-        await om.update({ barcode: null })
-        assert.isNull(om.barcode)
-        var om1 = await cm.get({ id: 1 })
-        assert.isNull(om1.barcode)
+        let product = await Product.objects.create({ barcode: "product 1" })
+        await product.update({ barcode: null })
+        assert.isNull(product.barcode)
+        let product1 = await Product.objects.get({ id: product.id })
+        assert.isNull(product1.barcode)
     })
 
     it("test delete", async () => {
-        var cm = new CollectionManager(Product)
-        var om = await cm.create({ barcode: "product 1" })
-        await om.delete()
-        try {
-            await cm.get({ barcode: "product 1" })
-            assert.fail("should not have got here")
-        } catch (error) {
-            expect(error.message).to.equal(
-                ".get() must receive exactly 1 object, but got 0."
-            )
-        }
+        let product = await Product.objects.create({ barcode: "product 1" })
+        await product.delete()
+        assert.equal((await Product.objects.page({})).objects_count, 0)
     })
 
     it("test modify using properties to blank and null", async () => {
-        var cm = new CollectionManager(Product)
-        var om = await cm.create({ barcode: "product 1" })
-        om.barcode = ""
-        await om.save()
-        var find = await cm.get({ id: 1 })
+        let product = await Product.objects.create({ barcode: "product 1" })
+        product.barcode = ""
+        await product.save()
+        let find = await Product.objects.get({ id: product.id })
         expect(find.barcode).to.equal("")
-        om.barcode = null
-        await om.save()
-        find = await cm.get({ id: 1 })
+        product.barcode = null
+        await product.save()
+        find = await Product.objects.get({ id: product.id })
         assert.isNull(find.barcode)
-    })
-
-    it("test modify properties", async () => {
-        var cm = new CollectionManager(Brand)
-        var om = await cm.create({ name: "nike" })
-        om.name = "adidas"
-        await om.save()
-        var om1 = await cm.get({ id: 1 })
-        expect(om1.name).to.equal("adidas")
-    })
-
-    it("test modify foreign key", async () => {
-        var pcm = new CollectionManager(Product)
-        var pom = await pcm.create({ barcode: "product 1" })
-
-        var bcm = new CollectionManager(Brand)
-        var bom = await bcm.create({ name: "nike" })
-
-        pom.brand_id = 1
-        await pom.save()
-
-        var pom2 = await pcm.get({ brand_id: 1 })
-        expect(pom2.barcode).to.equal("product 1")
-    })
-
-    it("test constructor pass in object", async () => {
-        var pcm = new CollectionManager(Product)
-        for (let i = 0; i < 3; i++) {
-            await pcm.create({ barcode: `pen ${i + 1}` })
-        }
-
-        var ppr = await pcm.page({ query: { id__in: [1, 2, 3] } })
-        var objm = new ObjectManagerImpl<Product>(
-            ppr.objects[0]
-        ) as ObjectManager<Product>
-        expect(objm.barcode).to.equal("pen 1")
-        assert.equal(objm.id, 1)
-        assert.isNull(objm.brand_id)
     })
 })

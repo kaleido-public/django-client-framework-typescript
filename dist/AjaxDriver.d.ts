@@ -1,6 +1,8 @@
 import { AxiosError } from "axios";
 import { Model } from "./Model";
 import { PageResult } from "./PageResult";
+declare const log: import("loglevel").Logger;
+export { log as AjaxDriverLogger };
 export declare type HttpMethod = "DELETE" | "POST" | "GET" | "PUT" | "PATCH";
 declare type StringDict = {
     [_: string]: string;
@@ -15,11 +17,10 @@ export interface AjaxDriver {
     url_prefix: string;
 }
 export declare class AjaxError {
-    private error;
-    constructor(error: AxiosError);
+    axioError: AxiosError;
+    constructor(axioError: AxiosError);
     get json(): unknown;
     get status(): number | undefined;
 }
 export declare const Ajax: AjaxDriver;
-export {};
 //# sourceMappingURL=AjaxDriver.d.ts.map

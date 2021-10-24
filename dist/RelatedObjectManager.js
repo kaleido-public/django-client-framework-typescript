@@ -81,7 +81,7 @@ var RelatedObjectManager = (function () {
     RelatedObjectManager.prototype.set = function (val) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2, AjaxDriver_1.Ajax.request_void("PATCH", this.object_url, val.id.toString())];
+                return [2, AjaxDriver_1.Ajax.request_void("PATCH", this.object_url, val.id)];
             });
         });
     };
