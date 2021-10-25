@@ -91,6 +91,8 @@ export function deduceError(httpStatusCode: number, backendResponse: any): DCFEr
                 return new NotFound()
             case "throttled":
                 return new Throttled()
+            case "invalid":
+                return new InvalidInput(new Map(), message)
             default:
                 return new ProgrammingError(message)
         }
