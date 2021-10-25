@@ -1,5 +1,5 @@
-import { ObjectManager } from ".";
-import { Model } from "./Model";
+import type { ObjectManager } from ".";
+import type { Model } from "./Model";
 export declare class PageResult<T extends Model> {
     page: number;
     limit: number;

@@ -37,6 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RelatedObjectManager = void 0;
+var _1 = require(".");
 var AjaxDriver_1 = require("./AjaxDriver");
 var ObjectManager_1 = require("./ObjectManager");
 var RelatedObjectManager = (function () {
@@ -66,7 +67,7 @@ var RelatedObjectManager = (function () {
                         return [2, new ObjectManager_1.ObjectManagerImpl(model)];
                     case 2:
                         error_1 = _a.sent();
-                        if (error_1.status === 404) {
+                        if (error_1 instanceof _1.NotFound) {
                             return [2, null];
                         }
                         else {

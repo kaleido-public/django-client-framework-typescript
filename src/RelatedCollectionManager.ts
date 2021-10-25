@@ -1,6 +1,6 @@
-import { Ajax } from "./AjaxDriver"
-import { Model } from "./Model"
 import { AbstractCollectionManager } from "./AbstractCollectionManager"
+import { Ajax } from "./AjaxDriver"
+import type { Model } from "./Model"
 
 export class RelatedCollectionManager<
     T extends Model,

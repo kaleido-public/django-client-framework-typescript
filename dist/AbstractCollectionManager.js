@@ -48,6 +48,7 @@ var __values = (this && this.__values) || function(o) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AbstractCollectionManager = void 0;
+var _1 = require(".");
 var AjaxDriver_1 = require("./AjaxDriver");
 var helpers_1 = require("./helpers");
 var ObjectManager_1 = require("./ObjectManager");
@@ -108,8 +109,11 @@ var AbstractCollectionManager = (function () {
                     case 0: return [4, this.page({ query: query, page: { limit: 2 } })];
                     case 1:
                         page = _a.sent();
-                        if (page.objects_count !== 1) {
-                            throw new Error(".get() must receive exactly 1 object, but got " + page.objects_count + ".");
+                        if (page.objects_count == 0) {
+                            throw new _1.NotFound();
+                        }
+                        else if (page.objects_count > 1) {
+                            throw new _1.ProgrammingError(".get() must receive exactly 1 object, but got " + page.objects_count + ".");
                         }
                         return [2, new ObjectManager_1.ObjectManagerImpl(page.objects[0])];
                 }

@@ -1,6 +1,6 @@
 import { Ajax } from "./AjaxDriver"
 import { getKeys } from "./helpers"
-import { Model } from "./Model"
+import type { Model } from "./Model"
 
 export type ObjectManager<T extends Model> = ObjectManagerImpl<T> & T
 

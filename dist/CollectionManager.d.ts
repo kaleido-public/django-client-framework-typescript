@@ -1,6 +1,6 @@
-import { Model } from "./Model";
-import { ObjectManager } from "./ObjectManager";
 import { AbstractCollectionManager } from "./AbstractCollectionManager";
+import type { Model } from "./Model";
+import type { ObjectManager } from "./ObjectManager";
 export declare class CollectionManager<T extends Model> extends AbstractCollectionManager<T> {
     T: new () => T;
     constructor(T: new () => T);

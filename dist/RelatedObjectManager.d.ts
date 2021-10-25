@@ -1,5 +1,5 @@
-import { Model } from "./Model";
-import { ObjectManager } from "./ObjectManager";
+import type { Model } from "./Model";
+import type { ObjectManager } from "./ObjectManager";
 export declare class RelatedObjectManager<T extends Model, P extends Model> {
     parent_id: number | string;
     parent_key: string;

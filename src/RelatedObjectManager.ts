@@ -1,6 +1,8 @@
+import { NotFound } from "."
 import { Ajax } from "./AjaxDriver"
-import { Model } from "./Model"
-import { ObjectManager, ObjectManagerImpl } from "./ObjectManager"
+import type { Model } from "./Model"
+import type { ObjectManager } from "./ObjectManager"
+import { ObjectManagerImpl } from "./ObjectManager"
 
 export class RelatedObjectManager<T extends Model, P extends Model> {
     parent_id: number | string
@@ -23,7 +25,7 @@ export class RelatedObjectManager<T extends Model, P extends Model> {
             let model = await Ajax.request_decode(this.T, "GET", this.object_url)
             return new ObjectManagerImpl<T>(model) as any
         } catch (error: any) {
-            if (error.status === 404) {
+            if (error instanceof NotFound) {
                 return null
             } else {
                 throw error

@@ -29,10 +29,15 @@ def prettier(args, **kwargs):
     )
 
 
+def eslint(args):
+    return run(["npx", "eslint", ".", "--ext", ".ts", *args], cwd=SDK_ROOT)
+
+
 def check_only():
     try:
         run(["flake8", "--show-source", "."], cwd=SDK_ROOT, check=True)
         run(["black", "--check", "."], cwd=SDK_ROOT, check=True)
+        eslint([]),
         prettier(["--check", "."], cwd=SDK_ROOT)
     except CalledProcessError as expt:
         exit(f"Issues found after running {expt.cmd} in {SDK_ROOT}.")
@@ -40,6 +45,7 @@ def check_only():
 
 def format_files():
     run(["black", "."], cwd=SDK_ROOT)
+    eslint(["--fix"])
     prettier(["-w", "."], cwd=SDK_ROOT)
 
 

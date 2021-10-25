@@ -1,9 +1,11 @@
+import { NotFound, ProgrammingError } from "."
 import { Ajax } from "./AjaxDriver"
 import { getKeys } from "./helpers"
-import { Model } from "./Model"
-import { ObjectManager, ObjectManagerImpl } from "./ObjectManager"
-import { PageResult } from "./PageResult"
-import { PageQuery } from "./query"
+import type { Model } from "./Model"
+import type { ObjectManager } from "./ObjectManager"
+import { ObjectManagerImpl } from "./ObjectManager"
+import type { PageResult } from "./PageResult"
+import type { PageQuery } from "./query"
 
 type ValidPropertyType = number | string | boolean | ValidPropertyType[]
 type QueryParams<T> = { [k: string]: ValidPropertyType } | Partial<T>
@@ -41,8 +43,10 @@ export abstract class AbstractCollectionManager<T extends Model> {
 
     async get(query: QueryParams<T>): Promise<ObjectManager<T>> {
         const page = await this.page({ query: query, page: { limit: 2 } })
-        if (page.objects_count !== 1) {
-            throw new Error(
+        if (page.objects_count == 0) {
+            throw new NotFound()
+        } else if (page.objects_count > 1) {
+            throw new ProgrammingError(
                 `.get() must receive exactly 1 object, but got ${page.objects_count}.`
             )
         }

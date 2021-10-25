@@ -1,13 +1,9 @@
-import { assert, expect } from "chai"
-import {
-    ObjectManagerImpl,
-    ObjectManager,
-    Ajax,
-    CollectionManager,
-} from "django-client-framework"
-import { Product } from "./models/Product"
-import { Brand } from "./models/Brand"
 import Axios from "axios"
+import { assert, expect } from "chai"
+import { Ajax } from "django-client-framework"
+
+import { Brand } from "./models/Brand"
+import { Product } from "./models/Product"
 
 Ajax.url_prefix = "http://server:8000"
 

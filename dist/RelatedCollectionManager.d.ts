@@ -1,5 +1,5 @@
-import { Model } from "./Model";
 import { AbstractCollectionManager } from "./AbstractCollectionManager";
+import type { Model } from "./Model";
 export declare class RelatedCollectionManager<T extends Model, P extends Model> extends AbstractCollectionManager<T> {
     parent_id: number | string;
     parent_key: string;

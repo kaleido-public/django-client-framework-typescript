@@ -1,5 +1,6 @@
-import { ObjectManager, ObjectManagerImpl } from "."
-import { Model } from "./Model"
+import type { ObjectManager } from "."
+import { ObjectManagerImpl } from "."
+import type { Model } from "./Model"
 
 export class PageResult<T extends Model> {
     page: number = 0

@@ -1,9 +1,10 @@
-import { assert, expect } from "chai"
-import { CollectionManager, Ajax, AjaxDriverLogger } from "django-client-framework"
-import { Product } from "./models/Product"
-import { Brand } from "./models/Brand"
 import Axios from "axios"
+import { expect } from "chai"
+import { Ajax } from "django-client-framework"
 import * as uuid from "uuid"
+
+import { Brand } from "./models/Brand"
+import { Product } from "./models/Product"
 
 Ajax.url_prefix = "http://server:8000"
 
@@ -13,7 +14,6 @@ describe("object manager tests", () => {
     })
 
     it("test set/get brand", async () => {
-        AjaxDriverLogger.enableAll()
         let brand = await Brand.objects.create({ name: "nike" })
         let id = uuid.v4()
         let product = await Product.objects.create({ id: id, barcode: "zoomfly v1" })

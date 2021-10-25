@@ -1,4 +1,5 @@
 import { CollectionManager, Model, RelatedObjectManager } from "django-client-framework"
+
 import { Brand } from "./Brand"
 
 export class Product extends Model {
