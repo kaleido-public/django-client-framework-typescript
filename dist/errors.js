@@ -14,6 +14,17 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __values = (this && this.__values) || function(o) {
     var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
     if (m) return m.call(o);
@@ -132,6 +143,13 @@ var InvalidInput = (function (_super) {
         Object.setPrototypeOf(_this, InvalidInput.prototype);
         return _this;
     }
+    InvalidInput.prototype.as = function (validator) {
+        if (validator && !validator(this.fields)) {
+            console.error("The validator returned false. The InvalidInput error's fields are of a different type than expected.", this.fields);
+            throw new ProgrammingError("The validator returned false. The InvalidInput error's fields are of a different type than expected.");
+        }
+        return __assign(__assign({}, Object.fromEntries(this.fields)), { general: this.general });
+    };
     return InvalidInput;
 }(InputError));
 exports.InvalidInput = InvalidInput;
@@ -168,6 +186,8 @@ function deduceError(httpStatusCode, backendResponse) {
                 return new NotFound();
             case "throttled":
                 return new Throttled();
+            case "invalid":
+                return new InvalidInput(new Map(), message);
             default:
                 return new ProgrammingError(message);
         }

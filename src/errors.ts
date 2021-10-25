@@ -62,6 +62,19 @@ export class InvalidInput extends InputError {
         this.name = "InvalidInput"
         Object.setPrototypeOf(this, InvalidInput.prototype)
     }
+
+    as<T extends { general?: string[] }>(validator?: (data: any) => boolean): T {
+        if (validator && !validator(this.fields)) {
+            console.error(
+                "The validator returned false. The InvalidInput error's fields are of a different type than expected.",
+                this.fields
+            )
+            throw new ProgrammingError(
+                "The validator returned false. The InvalidInput error's fields are of a different type than expected."
+            )
+        }
+        return { ...Object.fromEntries(this.fields), general: this.general } as any
+    }
 }
 
 export class TemporaryNetworkFailure extends RetriableError {
