@@ -13,4 +13,4 @@ services:
       context: .
       dockerfile: ./server.dockerfile
       args:
-        DCF_BRANCH: "710f600"
+        DCF_BRANCH: "8f57188"

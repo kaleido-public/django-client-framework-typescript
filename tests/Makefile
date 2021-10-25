@@ -2,7 +2,7 @@ default: run-server build-test test clean
 	@echo Done
 
 run-server:
-	docker-compose up -d server
+	docker-compose up --build -d server
 
 build-test:
 	cd .. && npm install && npm run build &&\

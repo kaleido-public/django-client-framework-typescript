@@ -1,7 +1,8 @@
-import { Ajax } from "./AjaxDriver"
-import { Model } from "./Model"
-import { ObjectManager, ObjectManagerImpl } from "./ObjectManager"
 import { AbstractCollectionManager } from "./AbstractCollectionManager"
+import { Ajax } from "./AjaxDriver"
+import type { Model } from "./Model"
+import type { ObjectManager } from "./ObjectManager"
+import { ObjectManagerImpl } from "./ObjectManager"
 
 export class CollectionManager<T extends Model> extends AbstractCollectionManager<T> {
     T: new () => T

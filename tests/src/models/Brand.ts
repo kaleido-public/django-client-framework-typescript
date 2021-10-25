@@ -3,6 +3,7 @@ import {
     Model,
     RelatedCollectionManager,
 } from "django-client-framework"
+
 import { Product } from "./Product"
 
 export class Brand extends Model {

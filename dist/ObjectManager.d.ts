@@ -1,4 +1,4 @@
-import { Model } from "./Model";
+import type { Model } from "./Model";
 export declare type ObjectManager<T extends Model> = ObjectManagerImpl<T> & T;
 export declare class ObjectManagerImpl<T extends Model> {
     original: T;

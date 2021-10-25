@@ -1,9 +1,12 @@
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios"
-import * as qs from "qs"
-import { JSONDecoder } from "./JSONDecoder"
-import { Model } from "./Model"
-import { PageResult } from "./PageResult"
+import type { AxiosError, AxiosRequestConfig } from "axios"
+import axios from "axios"
 import { getLogger } from "loglevel"
+import * as qs from "qs"
+
+import { deduceError } from "./errors"
+import { JSONDecoder } from "./JSONDecoder"
+import type { Model } from "./Model"
+import { PageResult } from "./PageResult"
 
 const log = getLogger("AjaxDriver.ts")
 export { log as AjaxDriverLogger }
@@ -37,16 +40,6 @@ export interface AjaxDriver {
     additional_headers: StringDict
     auth_token: string
     url_prefix: string
-}
-
-export class AjaxError {
-    constructor(public axioError: AxiosError) {}
-    get json(): unknown {
-        return this.axioError.response?.data
-    }
-    get status(): number | undefined {
-        return this.axioError.response?.status
-    }
 }
 
 class AxiosAjaxDriver implements AjaxDriver {
@@ -130,7 +123,10 @@ class AxiosAjaxDriver implements AjaxDriver {
                 current_request_id,
                 axioError.response?.data
             )
-            throw new AjaxError(error)
+            throw deduceError(
+                axioError.response?.status ?? 0,
+                axioError.response?.data ?? {}
+            )
         }
     }
 

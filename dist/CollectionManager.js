@@ -63,9 +63,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CollectionManager = void 0;
+var AbstractCollectionManager_1 = require("./AbstractCollectionManager");
 var AjaxDriver_1 = require("./AjaxDriver");
 var ObjectManager_1 = require("./ObjectManager");
-var AbstractCollectionManager_1 = require("./AbstractCollectionManager");
 var CollectionManager = (function (_super) {
     __extends(CollectionManager, _super);
     function CollectionManager(T) {

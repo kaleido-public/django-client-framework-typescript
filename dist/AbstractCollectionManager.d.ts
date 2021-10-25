@@ -1,7 +1,7 @@
-import { Model } from "./Model";
-import { ObjectManager } from "./ObjectManager";
-import { PageResult } from "./PageResult";
-import { PageQuery } from "./query";
+import type { Model } from "./Model";
+import type { ObjectManager } from "./ObjectManager";
+import type { PageResult } from "./PageResult";
+import type { PageQuery } from "./query";
 declare type ValidPropertyType = number | string | boolean | ValidPropertyType[];
 declare type QueryParams<T> = {
     [k: string]: ValidPropertyType;

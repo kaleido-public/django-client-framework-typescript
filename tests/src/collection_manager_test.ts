@@ -1,26 +1,22 @@
-import { assert, expect } from "chai"
-import { CollectionManager, Ajax } from "django-client-framework"
 import Axios from "axios"
+import * as chai from "chai"
+import { assert, expect } from "chai"
+import { Ajax, NotFound } from "django-client-framework"
+
 import { Product } from "./models/Product"
-import { getLogger, setLevel } from "loglevel"
-import { AjaxDriverLogger } from "django-client-framework"
 Ajax.url_prefix = "http://server:8000"
+import chaiAsPromised from "chai-as-promised"
+chai.use(chaiAsPromised)
 
 describe("collection manager tests", () => {
     beforeEach(async () => {
-        // Axios.defaults = {...Axios.defaults, baseURL: "http://server:8000"}
         await Axios.get("http://server:8000/subapp/clear")
     })
 
     it("test get object none should fail", async () => {
-        try {
-            await Product.objects.get({ id__in: [] })
-            assert.fail("shouldn't have reached here")
-        } catch (error: any) {
-            expect(error.message).to.equal(
-                ".get() must receive exactly 1 object, but got 0."
-            )
-        }
+        await expect(Product.objects.get({ id__in: [] })).to.eventually.be.rejectedWith(
+            NotFound
+        )
     })
 
     it("test get object one should pass", async () => {

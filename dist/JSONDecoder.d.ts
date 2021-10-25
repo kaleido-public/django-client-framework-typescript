@@ -1,4 +1,4 @@
-import { Model } from "./Model";
+import type { Model } from "./Model";
 interface JSONDecoderInterface {
     decode_model<T extends Model>(T: new () => T, json: Object): T;
 }
