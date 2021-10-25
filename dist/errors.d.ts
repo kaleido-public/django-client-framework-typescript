@@ -24,6 +24,9 @@ export declare class InvalidInput extends InputError {
     fields: Map<string, string[]>;
     general: string[];
     constructor(fields: Map<string, string[]>, general: string[]);
+    as<T extends {
+        general?: string[];
+    }>(validator?: (data: any) => boolean): T;
 }
 export declare class TemporaryNetworkFailure extends RetriableError {
     constructor();
