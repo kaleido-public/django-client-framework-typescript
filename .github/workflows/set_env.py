@@ -77,6 +77,10 @@ def should_upload_package() -> bool:
     return git_branch_name() == "release"
 
 
+def should_upload_image() -> bool:
+    return git_branch_name() in ["release", "staging"]
+
+
 def package_version() -> str:
     with open("package.json", "rb") as content:
         package = json.load(content)
@@ -110,6 +114,7 @@ def get_env() -> Dict[str, Union[str, bool]]:
         "TARGET_BRANCH": target_branch(),
         "COMMIT_TITLE": git_commit_title(),
         "SHOULD_UPLOAD_PACKAGE": should_upload_package(),
+        "SHOULD_UPLOAD_IMAGE": should_upload_image(),
         "PACKAGE_VERSION": package_version(),
         "PATH": overwrite_path(),
         "PR_BODY": pr_body(),

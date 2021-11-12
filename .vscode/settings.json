@@ -1,0 +1,11 @@
+{
+  "coverage-gutters.remotePathResolve": [
+    "node_modules/django-client-framework/",
+    "/home/yuli/django-client-framework-typescript/"
+  ],
+  "coverage-gutters.showLineCoverage": true,
+  "files.exclude": {
+    "**/dist": true,
+    "tests/django-client-framework": true
+  }
+}

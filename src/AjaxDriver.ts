@@ -1,9 +1,15 @@
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios"
+import type { AxiosError, AxiosRequestConfig } from "axios"
+import axios from "axios"
+import { getLogger } from "loglevel"
 import * as qs from "qs"
+
+import { deduceError } from "./errors"
 import { JSONDecoder } from "./JSONDecoder"
-import { Model } from "./Model"
+import type { Model } from "./Model"
 import { PageResult } from "./PageResult"
 
+const log = getLogger("AjaxDriver.ts")
+export { log as AjaxDriverLogger }
 export type HttpMethod = "DELETE" | "POST" | "GET" | "PUT" | "PATCH"
 
 let REQUEST_ID = 0
@@ -34,21 +40,6 @@ export interface AjaxDriver {
     additional_headers: StringDict
     auth_token: string
     url_prefix: string
-}
-
-export interface AjaxError {
-    readonly json: any
-    readonly status: number
-}
-
-class AxiosAjaxError implements AjaxError {
-    constructor(private error: AxiosError) {}
-    get json(): any {
-        return this.error.response?.data
-    }
-    get status(): number {
-        return this.error.response?.status || 0
-    }
 }
 
 class AxiosAjaxDriver implements AjaxDriver {
@@ -96,55 +87,46 @@ class AxiosAjaxDriver implements AjaxDriver {
     async request(method: HttpMethod, url: string, data: any = {}): Promise<any> {
         const current_request_id = REQUEST_ID++
         url = this.url_prefix + url
-        try {
-            console.debug(
-                "AxiosAjaxDriver sent",
-                current_request_id,
-                method,
-                url,
-                JSON.stringify(data)
-            )
-        } catch (err) {
-            console.error(
-                "AxiosAjaxDriver failed to send",
-                current_request_id,
-                method,
-                url,
-                JSON.stringify(data)
-            )
-            throw err
+        log.debug("AxiosAjaxDriver sent", current_request_id, method, url, data)
+        let request: AxiosRequestConfig = {
+            url: url,
+            method: method,
+            headers: this.get_headers(),
+            timeout: 30 * 1000,
+            paramsSerializer: function (params: any) {
+                return qs.stringify(params, { arrayFormat: "brackets" })
+            },
+        }
+        if (typeof data == "string") {
+            // need to turn "abc" into '"abc"'
+            data = JSON.stringify(data)
+        }
+        if (method == "GET") {
+            request = { ...request, params: data }
+        } else {
+            request = { ...request, data: data }
         }
         try {
-            let request: AxiosRequestConfig = {
-                url: url,
-                method: method,
-                headers: this.get_headers(),
-                timeout: 30 * 1000,
-                paramsSerializer: function (params: any) {
-                    return qs.stringify(params, { arrayFormat: "brackets" })
-                },
-            }
-            if (method == "GET") {
-                request = { ...request, params: data }
-            } else {
-                request = { ...request, data: data }
-            }
             const response = await axios(request)
-            console.debug(
+            log.debug(
                 "AxiosAjaxDriver received",
                 current_request_id,
                 response.status,
                 response.statusText,
-                JSON.stringify(response.data)
+                response.data
             )
             return response.data
-        } catch (error) {
-            console.warn(
-                "AxiosAjaxDriver failed to receive",
+        } catch (error: any) {
+            let axioError: AxiosError = error
+            log.warn(
+                "AxiosAjaxDriver received error",
                 current_request_id,
-                JSON.stringify(error)
+                axioError.response?.data
             )
-            throw new AxiosAjaxError(error)
+            throw deduceError(
+                axioError.response?.status ?? 0,
+                axioError.response?.data ?? {}
+            )
         }
     }
 

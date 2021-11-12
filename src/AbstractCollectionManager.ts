@@ -1,9 +1,11 @@
+import { NotFound, ProgrammingError } from "."
 import { Ajax } from "./AjaxDriver"
 import { getKeys } from "./helpers"
-import { Model } from "./Model"
-import { ObjectManager, ObjectManagerImpl } from "./ObjectManager"
-import { PageResult } from "./PageResult"
-import { PageQuery } from "./query"
+import type { Model } from "./Model"
+import type { ObjectManager } from "./ObjectManager"
+import { ObjectManagerImpl } from "./ObjectManager"
+import type { PageResult } from "./PageResult"
+import type { PageQuery } from "./query"
 
 type ValidPropertyType = number | string | boolean | ValidPropertyType[]
 type QueryParams<T> = { [k: string]: ValidPropertyType } | Partial<T>
@@ -19,7 +21,20 @@ export abstract class AbstractCollectionManager<T extends Model> {
         query?: QueryParams<T>
         page?: PageQuery
     }): Promise<PageResult<T>> {
-        let to_send: any = query
+        let to_send: any = {}
+        for (let key of getKeys(query)) {
+            let val: any = query[key]
+            if (Array.isArray(val) && val.length == 0) {
+                val = [null] // the qs.stringify function requires the empty array to be passed as [null]
+            }
+            let key_any: any = key
+            if (val == null) {
+                // translates something like {foo: null} to {foo__isnull: true}
+                key_any += "__isnull"
+                val = true
+            }
+            to_send[key_any] = val
+        }
         for (let key of getKeys(page)) {
             to_send[`_${key}`] = page[key]
         }
@@ -28,9 +43,11 @@ export abstract class AbstractCollectionManager<T extends Model> {
 
     async get(query: QueryParams<T>): Promise<ObjectManager<T>> {
         const page = await this.page({ query: query, page: { limit: 2 } })
-        if (page.total !== 1) {
-            throw new Error(
-                `.get() must receive exactly 1 object, but got ${page.total}.`
+        if (page.objects_count == 0) {
+            throw new NotFound()
+        } else if (page.objects_count > 1) {
+            throw new ProgrammingError(
+                `.get() must receive exactly 1 object, but got ${page.objects_count}.`
             )
         }
         return new ObjectManagerImpl(page.objects[0]) as ObjectManager<T>

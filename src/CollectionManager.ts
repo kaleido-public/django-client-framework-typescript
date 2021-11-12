@@ -1,8 +1,8 @@
-import { Ajax } from "./AjaxDriver"
-import { Model } from "./Model"
-import { model_name } from "./helpers"
-import { ObjectManager, ObjectManagerImpl } from "./ObjectManager"
 import { AbstractCollectionManager } from "./AbstractCollectionManager"
+import { Ajax } from "./AjaxDriver"
+import type { Model } from "./Model"
+import type { ObjectManager } from "./ObjectManager"
+import { ObjectManagerImpl } from "./ObjectManager"
 
 export class CollectionManager<T extends Model> extends AbstractCollectionManager<T> {
     T: new () => T
@@ -11,8 +11,13 @@ export class CollectionManager<T extends Model> extends AbstractCollectionManage
         this.T = T
     }
 
+    get model_name(): string {
+        let object = new this.T()
+        return object._model_name.toLowerCase()
+    }
+
     get collection_url(): string {
-        return `/${model_name(this.T)}`
+        return `/${this.model_name}`
     }
 
     async create(data: Partial<T>): Promise<ObjectManager<T>> {
@@ -33,13 +38,13 @@ export class CollectionManager<T extends Model> extends AbstractCollectionManage
         defaults?: Partial<T>
     }): Promise<ObjectManager<T>> {
         let page = await this.page({ query: query, page: { limit: 2 } })
-        if (page.total === 0) {
+        if (page.objects_count === 0) {
             return this.create({ ...query, ...defaults })
-        } else if (page.total === 1) {
+        } else if (page.objects_count === 1) {
             return new ObjectManagerImpl(page.objects[0]) as ObjectManager<T>
         } else {
             throw new Error(
-                `.get() must receive exactly 1 object, but got ${page.total}.`
+                `.get() must receive exactly 1 object, but got ${page.objects_count}.`
             )
         }
     }
@@ -52,15 +57,15 @@ export class CollectionManager<T extends Model> extends AbstractCollectionManage
         defaults?: Partial<T>
     }): Promise<ObjectManager<T>> {
         let page = await this.page({ query: query, page: { limit: 2 } })
-        if (page.total === 0) {
+        if (page.objects_count === 0) {
             return this.create({ ...query, ...defaults })
-        } else if (page.total === 1) {
+        } else if (page.objects_count === 1) {
             let manager = new ObjectManagerImpl(page.objects[0]) as ObjectManager<T>
-            manager.update(defaults)
-            return manager
+            return manager.update(defaults)
+            // return manager
         } else {
             throw new Error(
-                `.get() must receive exactly 1 object, but got ${page.total}.`
+                `.get() must receive exactly 1 object, but got ${page.objects_count}.`
             )
         }
     }

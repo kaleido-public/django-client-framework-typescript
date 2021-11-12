@@ -1,12 +1,12 @@
-import { ObjectManager, ObjectManagerImpl } from "."
-import { Model } from "./Model"
+import type { ObjectManager } from "."
+import { ObjectManagerImpl } from "."
+import type { Model } from "./Model"
 
 export class PageResult<T extends Model> {
     page: number = 0
     limit: number = 0
-    total: number = 0
-    previous: string = ""
-    next: string = ""
+    pages_count: number = 0
+    objects_count: number = 0
     objects: T[] = []
 
     get managers(): ObjectManager<T>[] {

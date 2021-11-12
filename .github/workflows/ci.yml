@@ -46,18 +46,25 @@ jobs:
             --title "${TARGET_BRANCH} <- ${BRANCH_NAME}: ${COMMIT_TITLE}" \
             --body "${PR_BODY}" <<< ${{ github.token }}
 
-      - name: Run style check
-        run: |
-          ./bin/checkstyle.py
-
-      - name: Build Package
-        run: |
-          npm install
-
       - name: Bump version and create PRs
         if: env.BRANCH_NAME == 'staging'
         run: |
           .github/workflows/bump_version.py -m --push <<< ${{ github.token }}
+
+      - name: Run style check
+        run: |
+          ./bin/checkstyle.py
+
+      - name: Run tests
+        run: make
+        working-directory: tests
+
+      - name: Push dcf-tsclient-test image
+        if: env.SHOULD_UPLOAD_IMAGE == 'True'
+        run: |
+          docker login --username ${{ github.actor }} --password-stdin ghcr.io <<< "${{ secrets.GITHUB_TOKEN }}"
+          docker tag ghcr.io/kaleido-public/dcf-tsclient-test:local ghcr.io/kaleido-public/dcf-tsclient-test:${BRANCH_NAME}
+          docker push ghcr.io/kaleido-public/dcf-tsclient-test:${BRANCH_NAME}
 
       - name: Publish package
         if: env.SHOULD_UPLOAD_PACKAGE == 'True'

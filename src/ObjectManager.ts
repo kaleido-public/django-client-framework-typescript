@@ -1,6 +1,6 @@
 import { Ajax } from "./AjaxDriver"
 import { getKeys } from "./helpers"
-import { Model } from "./Model"
+import type { Model } from "./Model"
 
 export type ObjectManager<T extends Model> = ObjectManagerImpl<T> & T
 
@@ -35,7 +35,7 @@ export class ObjectManagerImpl<T extends Model> {
     }
 
     get model_name(): string {
-        return this.model.constructor.name.toLowerCase()
+        return this.model._model_name.toLowerCase()
     }
 
     get object_url(): string {
@@ -64,18 +64,18 @@ export class ObjectManagerImpl<T extends Model> {
 
         let model = await Ajax.request_decode(this.T, "PATCH", this.object_url, to_send)
 
-        this.original = model
+        this.original = Object.assign(new this.T(), model)
         this.updated = model
     }
 
     async update(data: Partial<T>): Promise<this> {
         let model = await Ajax.request_decode(this.T, "PATCH", this.object_url, data)
-        this.original = model
+        this.original = Object.assign(new this.T(), model)
         this.updated = model
         return this
     }
 
-    get model(): Model {
+    get model(): T {
         return this.updated
     }
 }
